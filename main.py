@@ -11,7 +11,7 @@ import datetime
 from google.appengine.ext import db
 from google.appengine.api import users
 import cgi
-import model
+from model import QuestionPool
 
 
 class Question(db.Model):
@@ -24,24 +24,28 @@ class Question(db.Model):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-    	user = users.get_current_user()
-    	path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
-        if user:
-        	url = users.create_logout_url('/')
-        	url_text = 'Sign Out'
-        	q = db.GqlQuery("SELECT * FROM Question")
-        	template_values = {'user': users.get_current_user().nickname(),'url': url,'url_text': url_text,'name':user.nickname(),'questions':q}
-        	self.response.out.write(template.render(path, template_values))
+      user = users.get_current_user()
+      path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
+      if user:
+      	url = users.create_logout_url('/')
+      	url_text = 'Sign Out'
+      	q = db.GqlQuery("SELECT * FROM QuestionPool")
+      	template_values = {'user': users.get_current_user().nickname(),
+        'url': url,
+        'url_text': url_text,
+        'name':user.nickname(),
+        'questions':q}
+      	self.response.out.write(template.render(path, template_values))
 			# q = Question(questionId="q01",
 			# content="test on the first question",
 			# userId=users.get_current_user().email())
 			# q.created_date = datetime.datetime.now().date()
 			# q.put()
-        else:
-        	url = users.create_login_url(self.request.uri)
-        	url_text = 'Sign In'
-        	template_values = {'url': url,'url_text': url_text}
-        	self.response.out.write(template.render(path, template_values))
+      else:
+      	url = users.create_login_url(self.request.uri)
+      	url_text = 'Sign In'
+      	template_values = {'url': url,'url_text': url_text}
+      	self.response.out.write(template.render(path, template_values))
 
 
 class AddQuestionPage(webapp2.RequestHandler):
@@ -63,9 +67,21 @@ class AddQuestionPage(webapp2.RequestHandler):
 
 class CreateQuestion(webapp2.RequestHandler):
   def get(self):
-    self.response.write("successfully add question")
-
-
+    title=self.request.get("title")
+    if (title==""):
+      self.response.write("not add question")
+    else:
+      self.response.write("successfully add question")
+  def post(self):
+    questionContent=self.request.get("content")
+    tags=self.request.get("tag").split(";")
+    q = QuestionPool(title=self.request.get("title"),
+    content=questionContent,
+		userId=users.get_current_user().nickname(),
+    tag=tags
+    )
+    q.put()
+    self.response.write("successfully")
    
 app = webapp2.WSGIApplication([
     ('/', MainHandler),

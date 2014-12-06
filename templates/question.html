@@ -51,20 +51,27 @@
     </nav>
 
     <div class="container">
-    <h2>Add Question Here</h2>
+    <h2 class="page-header">Add Question Here</h2>
       <form role="form" action='/createQuestion' method="post">
         <div class="form-group">
+          <label for="questiontitle">Question Title:</label>
+          <input type="title" class="form-control" name="title" placeholder="Enter title"\>
+        </div>
+        <div class="form-group">
           <label for="question">Question:</label>
-          <!--input type="content" class="form-control" id="content" placeholder="Enter question"-->
           <textarea class="form-control" name="content" rows="10" placeholder="Enter Question"></textarea>
         </div>
         <div class="form-group">
           <label for="tag">Tags:</label>
-          <input type="tag" class="form-control" id="tag" placeholder="Enter tag">
+          <input type="tag" class="form-control" name="tag" placeholder="Enter tag (seperate by ;)">
         </div>
-        <button type="submit" class="btn btn-default">Submit</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
       </form>
     </div><!-- /.container -->
+
+    <footer>
+      <p class="text-center">&copy; Xin Wang</p>
+    </footer>
 
 
     <!-- Bootstrap core JavaScript
