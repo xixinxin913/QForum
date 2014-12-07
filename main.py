@@ -3,6 +3,7 @@
 # Copyright Xin Wang @2014.
 #
 import webapp2
+import urllib
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 import os
@@ -14,12 +15,12 @@ import cgi
 from model import QuestionPool
 
 
-class Question(db.Model):
-  questionId = db.StringProperty(required=True)
-  content = db.StringProperty(required=True)
-  created_date = db.DateProperty()
-  tag = db.BooleanProperty(indexed=False)
-  userId = db.StringProperty()
+# class Question(db.Model):
+#   questionId = db.StringProperty(required=True)
+#   content = db.StringProperty(required=True)
+#   created_date = db.DateProperty()
+#   tag = db.BooleanProperty(indexed=False)
+#   userId = db.StringProperty()
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -135,6 +136,26 @@ class ShowTags(webapp2.RequestHandler):
   def post(self):
     tag=self.request.get("tags")
 
+class EditQuestion(webapp2.RequestHandler):
+  def get(self):
+    self.response.out.write("begin edit")
+  def post(self):
+    user = users.get_current_user()
+    url = users.create_logout_url('/')
+    url_text = 'Sign Out'
+    questionKey=urllib.unquote(self.request.get("key"))
+    edit=self.request.get("edit")
+    if edit:
+      q = db.get(questionKey)
+      template_values = {'user': users.get_current_user().nickname(),
+      'url': url,
+      'url_text': url_text,
+      'name':user.nickname(),
+      'question':q}
+      path = os.path.join(os.path.dirname(__file__), 'templates/editQuestion.html')
+      self.response.out.write(template.render(path, template_values))
+    else:
+      self.response.out.write("please delete the instance")
 
 
    
@@ -143,7 +164,8 @@ app = webapp2.WSGIApplication([
     ('/addQuestionPage',AddQuestionPage),
     ('/createQuestion',CreateQuestion),
     (r'/showQuestion.*',ShowQuestion),
-    (r'/showTags.*',ShowTags)
+    (r'/showTags.*',ShowTags),
+    (r'/editQuestion.*',EditQuestion)
 ], debug=True)
 
 def main():

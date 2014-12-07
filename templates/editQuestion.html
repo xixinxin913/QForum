@@ -38,60 +38,40 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <!--button type="button" class="btn btn-lg btn-default">QForum</button-->
           <a class="navbar-brand" >QForum</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
-            <li><a href="/addQuestionPage">Create Question</a></li>
-            <li><a href="/">Hello {{name}}</a></li>
+            <li><a href="/">Home</a></li>
+            <li class="active"><a href="/.">Edit Question</a></li>
             <li><a href={{url}}>{{url_text}}</a></li>
-            <!--li class="dropdown">
-                <a href="/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-                  <li><a href="/addQuestionPage">Create Question</a></li>
-                  <li><a href="/">My Question</a></li>
-                </ul>
-            </li-->
           </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-      <h2 class="page-header">{{question.title}}</h2>
-      <p>
-        <div class="col-sm-8 blog-main">
-          <div class="blog-post">
-           <div class="well well-sm">
-             <p class="blog-post-meta"> {{ question.created_time|date:"F j, Y" }} by <a href="#">{{ question.userId }}</a></p>
-             {% autoescape off %}
-             <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{question.content|urlize|linebreaksbr }}</p>
-             {% endautoescape %}
-            </div>
-          </div>
-        {% if isAuthor %}
-        <form role="form" action='/editQuestion' method="post">
-          <input type="hidden" name="key" class="form-control" value={{question.key}}>
-          <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Question</button>
-          <button type="submit" name="delete" class="btn btn-default" value="True">Delete Question</button>
-        </form>
-      {% endif %}
+    <h2 class="page-header">Edit Your Question Here</h2>
+      <form role="form" action='/' method="post">
+        <div class="form-group">
+          <label for="questiontitle">Question Title:</label>
+          <input type="text" class="form-control" name="title" value="{{question.title}}">
         </div>
-        </p>
-    </div>
-    <div class="container">
-    <h2 class="page-header"></h2>
-      <footer>
-        <p class="text-center">&copy; Xin Wang</p>
-      </footer>
-    </div>
-          <!--a style="text-decoration:none"><h2>{{ q.content }}</h2></a>
-          <p class="postinfo"> Posted by 
-            <a href="/"  style="text-decoration:none" class="links">{{ q.userId }}</a> on <a href="/" class="links">{{q.created_date}}</a>
-            </p>
-    </div--><!-- /.container -->
+        <div class="form-group">
+          <label for="question">Question:</label>
+          <textarea class="form-control" name="content" rows="10">{{question.content}}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="tag">Tags:</label>
+          <input type="text" class="form-control" name="tag" value="{{question.tag}}">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div><!-- /.container -->
+
+    <footer>
+      <p class="text-center">&copy; Xin Wang</p>
+    </footer>
 
 
     <!-- Bootstrap core JavaScript
