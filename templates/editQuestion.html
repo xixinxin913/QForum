@@ -52,7 +52,7 @@
 
     <div class="container">
     <h2 class="page-header">Edit Your Question Here</h2>
-      <form role="form" action='/' method="post">
+      <form role="form" action='/updateQuestion' method="post">
         <div class="form-group">
           <label for="questiontitle">Question Title:</label>
           <input type="text" class="form-control" name="title" value="{{question.title}}">
@@ -65,6 +65,7 @@
           <label for="tag">Tags:</label>
           <input type="text" class="form-control" name="tag" value="{{question.tag}}">
         </div>
+        <input type="hidden" class="form-control" name="key" value="{{question.key}}">
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
     </div><!-- /.container -->

@@ -80,7 +80,7 @@
                   {% for v in q.tag %}
                     <p>
                      <form role="form" action='/showTags' method="get">
-                      <input type="hidden" name="tags" class="form-control" value={{v}}>
+                      <input type="hidden" name="tags" class="form-control" value="{{v}}">
                        <button type="submit" class="btn btn-primary btn-xs">{{v}}</button>
                      </form>
                     </p>

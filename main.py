@@ -15,14 +15,6 @@ import cgi
 from model import QuestionPool
 
 
-# class Question(db.Model):
-#   questionId = db.StringProperty(required=True)
-#   content = db.StringProperty(required=True)
-#   created_date = db.DateProperty()
-#   tag = db.BooleanProperty(indexed=False)
-#   userId = db.StringProperty()
-
-
 class MainHandler(webapp2.RequestHandler):
     def get(self):
       user = users.get_current_user()
@@ -117,7 +109,7 @@ class ShowTags(webapp2.RequestHandler):
     q = db.GqlQuery("SELECT * FROM QuestionPool where tag= :1" ,questionTag)
     self.response.out.write(q)
     user = users.get_current_user()
-    path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
+    path = os.path.join(os.path.dirname(__file__), 'templates/showTags.html')
     if user:
       url = users.create_logout_url('/')
       url_text = 'Sign Out'
@@ -125,7 +117,8 @@ class ShowTags(webapp2.RequestHandler):
       'url': url,
       'url_text': url_text,
       'name':user.nickname(),
-      'questions':q}
+      'questions':q,
+      'tag':questionTag}
       self.response.out.write(template.render(path, template_values))
     else:
       url = users.create_login_url(self.request.uri)
@@ -136,7 +129,7 @@ class ShowTags(webapp2.RequestHandler):
   def post(self):
     tag=self.request.get("tags")
 
-class EditQuestion(webapp2.RequestHandler):
+class EditQuestionPage(webapp2.RequestHandler):
   def get(self):
     self.response.out.write("begin edit")
   def post(self):
@@ -157,15 +150,31 @@ class EditQuestion(webapp2.RequestHandler):
     else:
       self.response.out.write("please delete the instance")
 
+class UpdateQuestion(webapp2.RequestHandler):
+  def get(self):
+    self.response.out.write("over")
+  def post(self):
+    questionKey=self.request.get("key")
+    q=db.get(questionKey)
+    tags=self.request.get("tag").split(";")
+    tags=[str(var).strip(" ") for var in tags]
+    q.content=self.request.get("content")
+    q.title=self.request.get("title")
+    q.modified_time=datetime.datetime.now()
+    q.tag=tags
+    q.put()
+    self.response.write("rewrite successfully")
 
-   
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/addQuestionPage',AddQuestionPage),
     ('/createQuestion',CreateQuestion),
     (r'/showQuestion.*',ShowQuestion),
     (r'/showTags.*',ShowTags),
-    (r'/editQuestion.*',EditQuestion)
+    (r'/editQuestion.*',EditQuestionPage),
+    (r'/updateQuestion.*',UpdateQuestion)
 ], debug=True)
 
 def main():
