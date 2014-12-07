@@ -60,44 +60,22 @@
     </nav>
 
     <div class="container">
-      <h2 class="page-header">All Questions</h2>
-        <div class="bs-table" class="text-center">        
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Questions</th>
-                <th>Tags</th>
-                <th>Vote</th>
-                <th>Post By</th>
-                <th>Created On</th>
-              </tr>
-            </thead>
-            {% for q in questions %}
-              <tbody>
-                <tr>
-                  <td class="col-md-6"><a href="/showQuestion?key={{ q.key }}"><h4>{{q.title }}</h4></a><em><small>{{q.content|slice:":500"}}</small></em> ...</td>
-                  <td class="col-md-1" style="vertical-align:middle"> 
-                  {% for v in q.tag %}
-                    <p>
-                     <form role="form" action='/' method="get">
-                      <input type="hidden" name="tags" class="form-control" value={{v}}>
-                       <button type="submit" class="btn btn-primary btn-xs">{{v}}</button>
-                     </form>
-                    </p>
-                  {% endfor %}
-                  </td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.vote}}</td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.userId}}</td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.created_time|date:"M/d"|upper }}</td>
-                </tr>
-              </tbody>
-            {% endfor %}
-          </table>
-      </div>
+      <h2 class="page-header">{{question.title}}</h2>
+        <div class="col-sm-8 blog-main">
+          <div class="blog-post">
+             <p class="blog-post-meta"> {{ question.created_time|date:"F j, Y" }} by <a href="#">{{ question.userId }}</a></p>
+             {% autoescape off %}
+             <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{question.content|urlize|linebreaksbr }}</p>
+             {% endautoescape %}
+          </div>
+        </div>
+    </div>
+    <div class="container">
     <h2 class="page-header"></h2>
       <footer>
         <p class="text-center">&copy; Xin Wang</p>
       </footer>
+    </div>
           <!--a style="text-decoration:none"><h2>{{ q.content }}</h2></a>
           <p class="postinfo"> Posted by 
             <a href="/"  style="text-decoration:none" class="links">{{ q.userId }}</a> on <a href="/" class="links">{{q.created_date}}</a>

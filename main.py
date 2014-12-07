@@ -82,11 +82,31 @@ class CreateQuestion(webapp2.RequestHandler):
     )
     q.put()
     self.response.write("successfully")
+
+class ShowQuestion(webapp2.RequestHandler):
+  def get(self):
+    user = users.get_current_user()
+    url = users.create_logout_url('/')
+    url_text = 'Sign Out'
+    questionKey=self.request.GET['key']
+    path = os.path.join(os.path.dirname(__file__), 'templates/showQuestion.html')
+    q = db.get(questionKey)
+    if q:
+      template_values = {'user': users.get_current_user().nickname(),
+      'url': url,
+      'url_text': url_text,
+      'name':user.nickname(),
+      'question':q}
+      self.response.out.write(template.render(path, template_values))
+    else:
+      self.response.out.write("no data")
+
    
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/addQuestionPage',AddQuestionPage),
-    ('/createQuestion',CreateQuestion)
+    ('/createQuestion',CreateQuestion),
+    (r'/showQuestion.*',ShowQuestion)
 ], debug=True)
 
 def main():
