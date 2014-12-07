@@ -29,7 +29,9 @@ class MainHandler(webapp2.RequestHandler):
       if user:
       	url = users.create_logout_url('/')
       	url_text = 'Sign Out'
-      	q = db.GqlQuery("SELECT * FROM QuestionPool")
+      	#q = db.GqlQuery("SELECT * FROM QuestionPool")
+        q=QuestionPool.all()
+        q.order('-created_time')
       	template_values = {'user': users.get_current_user().nickname(),
         'url': url,
         'url_text': url_text,
@@ -75,6 +77,7 @@ class CreateQuestion(webapp2.RequestHandler):
   def post(self):
     questionContent=self.request.get("content")
     tags=self.request.get("tag").split(";")
+    tags=[str(var) for var in tags]
     q = QuestionPool(title=self.request.get("title"),
     content=questionContent,
 		userId=users.get_current_user().nickname(),
@@ -91,22 +94,56 @@ class ShowQuestion(webapp2.RequestHandler):
     questionKey=self.request.GET['key']
     path = os.path.join(os.path.dirname(__file__), 'templates/showQuestion.html')
     q = db.get(questionKey)
+    #test if current user is auther
+    if (q.userId==user.nickname()):
+      isAuthor=True
+    else:
+      isAuthor=False
     if q:
       template_values = {'user': users.get_current_user().nickname(),
       'url': url,
       'url_text': url_text,
       'name':user.nickname(),
-      'question':q}
+      'question':q,
+      'isAuthor':isAuthor}
       self.response.out.write(template.render(path, template_values))
     else:
       self.response.out.write("no data")
+
+class ShowTags(webapp2.RequestHandler):
+  def get(self):
+    questionTag=self.request.GET['tags']
+    q = db.GqlQuery("SELECT * FROM QuestionPool where tag= :1" ,questionTag)
+    self.response.out.write(q)
+    user = users.get_current_user()
+    path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
+    if user:
+      url = users.create_logout_url('/')
+      url_text = 'Sign Out'
+      template_values = {'user': users.get_current_user().nickname(),
+      'url': url,
+      'url_text': url_text,
+      'name':user.nickname(),
+      'questions':q}
+      self.response.out.write(template.render(path, template_values))
+    else:
+      url = users.create_login_url(self.request.uri)
+      url_text = 'Sign In'
+      template_values = {'url': url,'url_text': url_text}
+      self.response.out.write(template.render(path, template_values))
+
+  def post(self):
+    tag=self.request.get("tags")
+
+
 
    
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/addQuestionPage',AddQuestionPage),
     ('/createQuestion',CreateQuestion),
-    (r'/showQuestion.*',ShowQuestion)
+    (r'/showQuestion.*',ShowQuestion),
+    (r'/showTags.*',ShowTags)
 ], debug=True)
 
 def main():

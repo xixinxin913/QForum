@@ -79,7 +79,7 @@
                   <td class="col-md-1" style="vertical-align:middle"> 
                   {% for v in q.tag %}
                     <p>
-                     <form role="form" action='/' method="get">
+                     <form role="form" action='/showTags' method="get">
                       <input type="hidden" name="tags" class="form-control" value={{v}}>
                        <button type="submit" class="btn btn-primary btn-xs">{{v}}</button>
                      </form>
@@ -95,6 +95,7 @@
           </table>
       </div>
     <h2 class="page-header"></h2>
+    <!--IMG SRC="http://www.videoinspiration.net/blog/wp-content/uploads/2014/09/Friendship.jpg" ALT="some text" WIDTH=32 HEIGHT=32-->
       <footer>
         <p class="text-center">&copy; Xin Wang</p>
       </footer>
