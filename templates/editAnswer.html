@@ -38,16 +38,15 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <!--button type="button" class="btn btn-lg btn-default">QForum</button-->
           <a class="navbar-brand" >QForum</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/">Home</a></li>
             {% if name %}
             <li><a href="/addQuestionPage">Create Question</a></li>
-            <li><a href="/">Hello {{name}}</a></li>
             {% endif %}
+            <li class="active"><a href="#">Edit Answer</a></li>
             <li><a href={{url}}>{{url_text}}</a></li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -55,57 +54,30 @@
     </nav>
 
     <div class="container">
-      <h2 class="page-header">All Questions</h2>
-        <div class="bs-table" class="text-center">        
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Questions</th>
-                <th>Tags</th>
-                <th>Vote</th>
-                <th>Post By</th>
-                <th>Created On</th>
-              </tr>
-            </thead>
-            {% for q in questions %}
-              <tbody>
-                <tr>
-                  <td class="col-md-6"><a href="/showQuestion?key={{ q.key }}"><h4>{{q.title }}</h4></a><em><small>{{q.content|slice:":500"}}</small></em> ...</td>
-                  <td class="col-md-1" style="vertical-align:middle"> 
-                  {% for v in q.tag %}
-                    <p>
-                     <form role="form" action='/showTags' method="get">
-                      <input type="hidden" name="tags" class="form-control" value="{{v}}">
-                       <button type="submit" class="btn btn-primary btn-xs">{{v}}</button>
-                     </form>
-                    </p>
-                  {% endfor %}
-                  </td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.vote}}</td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.userId}}</td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.created_time|date:"M/d"|upper }}</td>
-                </tr>
-              </tbody>
-            {% endfor %}
-          </table>
+    <h2 class="page-header">Edit Your Answer Here</h2>
+    <div class="col-sm-8 blog-main">
+      <form role="form" action='/updateAnswer' method="post">
+        <div class="form-group">
+          <label for="questiontitle">Question Title:</label>
+          <p class="form-control-static">{{question.title}}</p>
+        </div>
+        <div class="form-group">
+          <label for="disabledTextInput">Question:</label>
+          <textarea class="form-control" name="questionContent" rows="10" disabled>{{question.content}}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="Answer">Answer:</label>
+          <textarea class="form-control" name="content" rows="10">{{answer.content}}</textarea>
+        </div>
+        <input type="hidden" class="form-control" name="key" value="{{answer.key}}">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
       </div>
-<nav>
-  <ul class="pager">
-    <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
-    <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
-  </ul>
-</nav>
+    </div><!-- /.container -->
 
-    <h2 class="page-header"></h2>
-    <!--IMG SRC="http://www.videoinspiration.net/blog/wp-content/uploads/2014/09/Friendship.jpg" ALT="some text" WIDTH=32 HEIGHT=32-->
-      <footer>
-        <p class="text-center">&copy; Xin Wang</p>
-      </footer>
-          <!--a style="text-decoration:none"><h2>{{ q.content }}</h2></a>
-          <p class="postinfo"> Posted by 
-            <a href="/"  style="text-decoration:none" class="links">{{ q.userId }}</a> on <a href="/" class="links">{{q.created_date}}</a>
-            </p>
-    </div--><!-- /.container -->
+    <footer>
+      <p class="text-center">&copy; Xin Wang</p>
+    </footer>
 
 
     <!-- Bootstrap core JavaScript

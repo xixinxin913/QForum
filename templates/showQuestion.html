@@ -55,7 +55,17 @@
     </nav>
 
     <div class="container">
-      <h2 class="page-header">{{question.title}}</h2>
+      <h2 class="page-header"> 
+      <div class="btn-group-vertical" role="group" >
+      <button type="submit" name="edit" class="btn btn-primary" value="Ture">up</button>
+      <div> 
+      <p></p>
+      <p class="text-center" style="font-size: 16px;">1</p>
+      </div>
+      <button type="submit" name="edit" class="btn btn-primary" value="Ture">down</button> 
+      </div>
+      &nbsp;&nbsp;
+      {{question.title}}</h2>
       {% if question.tag %}
       <p>Tags:
       {% for t in question.tag %}
@@ -65,30 +75,35 @@
       {% endif %}
         <div class="col-sm-8 blog-main">
           <div class="blog-post">
-           <div class="well well-sm">
-             <p class="blog-post-meta"> {{ question.created_time|date:"F j, Y" }} by <a href="#">{{ question.userId }}</a></p>
-             {% autoescape off %}
-             <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{question.content|urlize|linebreaksbr }}</p>
-             {% endautoescape %}
-             <p class="blog-post-meta">
-             {% if question.modified_time %}
-             <i>Last Modified: {{ question.modified_time|date:"F j, Y" }}</i></p>
-             {% else %}
-             <i>Last Modified: {{ question.created_time|date:"F j, Y" }}</i></p>
-             {% endif %}
-            </div>
+            <div class="well well-sm">
+               <p class="blog-post-meta"> {{ question.created_time|date:"F j, Y" }} by <a href="#">{{ question.userId }}</a></p>
+               {% autoescape off %}
+               <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{question.content|urlize|linebreaksbr }}</p>
+               {% endautoescape %}
+               <p class="blog-post-meta">
+               {% if question.modified_time %}
+               <i>Last Modified: {{ question.modified_time|date:"F j, Y" }}</i></p>
+               {% else %}
+               <i>Last Modified: {{ question.created_time|date:"F j, Y" }}</i></p>
+               {% endif %}
+           </div>
           </div>
-        {% if isAuthor %}
-        <form role="form" action='/editQuestion' method="post">
-          <input type="hidden" name="key" class="form-control" value={{question.key}}>
-          <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Question</button>
-          <button type="submit" name="delete" class="btn btn-default" value="True">Delete Question</button>
-        </form>
-      {% endif %}
-        </div>
-        </p>
+          <form role="form" action='/editQuestion' method="post">
+            <input type="hidden" name="key" class="form-control" value={{question.key}}>
+            {% if name %}
+            <h4 class="pull-right"><a href="#"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{question.vote}}</span></a>
+            <a href="#"><b style="font-size: 18px">Down</b></a></h4>
+            {% endif %}
+           {% if isAuthor %}
+            <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Question</button>
+            <button type="submit" name="delete" class="btn btn-default" value="True">Delete Question</button>
+           {% endif %}
+          </form>
+     </div>
     </div>
     <!--show all the answers belong to the question-->
+
+   
 
     {% if answers %}
     <div class="container">
@@ -108,16 +123,20 @@
              <i>Last Modified: {{ a.created_time|date:"F j, Y" }}</i></p>
              {% endif %}
           </div>
-        {% ifequal a.userId name %}
-        <form role="form" action='/editQuestion' method="post">
-          <input type="hidden" name="key" class="form-control" value={{a.key}}>
-          <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Answer</button>
-          <button type="submit" name="delete" class="btn btn-default" value="True">Delete Answer</button>
-        </form>
+            <form role="form" action='/editAnswer' method="post">
+            <input type="hidden" name="key" class="form-control" value={{a.key}}>
+            {% if name %}
+            <h4 class="pull-right"><a href="/voteUp"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{question.vote}}</span></a>
+            <a href="/voteDown"><b style="font-size: 18px">Down</b></a></h4>
+            {% endif %}
+           {% ifequal a.userId name %}
+            <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Answer</button>
+            <button type="submit" name="delete" class="btn btn-default" value="True">Delete Answer</button>
+           {% endifequal %}
+          </form>
         <br>
         <br>
         <br>
-      {% endifequal %}
     </div>
     {% endfor %}
     </div><!-- /.container -->

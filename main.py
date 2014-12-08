@@ -180,6 +180,46 @@ class CreateAnswer(webapp2.RequestHandler):
     a.put()
     self.response.write("answer created successfully")
 
+class EditAnswer(webapp2.RequestHandler):
+	def post(self):
+		answerKey=self.request.get("key")
+		a=db.get(answerKey)
+		q=db.get(a.questionKey)
+		user = users.get_current_user()
+		url = users.create_logout_url('/')
+		url_text = 'Sign Out'
+		questionKey=urllib.unquote(self.request.get("key"))
+		edit=self.request.get("edit")
+		if edit:
+		  template_values = {'user': users.get_current_user().nickname(),
+		  'url': url,
+		  'url_text': url_text,
+		  'name':user.nickname(),
+		  'answer':a,
+		  'question':q}
+		  path = os.path.join(os.path.dirname(__file__), 'templates/editAnswer.html')
+		  self.response.out.write(template.render(path, template_values))
+		else:
+		  self.response.out.write("please delete the instance")
+
+class UpdataAnswer(webapp2.RequestHandler):
+	def post(self):
+	    answerKey=self.request.get("key")
+	    a=db.get(answerKey)
+	    a.content=self.request.get("content")
+	    a.modified_time=datetime.datetime.now()
+	    a.put()
+	    self.response.write("rewrite successfully")
+
+class VoteUp(webapp2.RequestHandler):
+	def get(self):
+		self.request.get("1")
+
+class VoteDown(webapp2.RequestHandler):
+	def get(self):
+		self.request.get("1")
+
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -189,7 +229,11 @@ app = webapp2.WSGIApplication([
     (r'/showTags.*',ShowTags),
     (r'/editQuestion.*',EditQuestionPage),
     (r'/updateQuestion.*',UpdateQuestion),
-    (r'/createAnswer.*',CreateAnswer)
+    (r'/createAnswer.*',CreateAnswer),
+    (r'/editAnswer.*',EditAnswer),
+    (r'/updateAnswer.*',UpdataAnswer),
+    (r'/voteUp.*',VoteUp),
+    (r'/voteDown.*',VoteDown)
 ], debug=True)
 
 def main():
