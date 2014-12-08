@@ -19,10 +19,10 @@ class MainHandler(webapp2.RequestHandler):
     def get(self):
       user = users.get_current_user()
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
+      # check if the user has sign in
       if user:
       	url = users.create_logout_url('/')
       	url_text = 'Sign Out'
-      	#q = db.GqlQuery("SELECT * FROM QuestionPool")
         q=QuestionPool.all()
         q.order('-created_time')
       	template_values = {'user': users.get_current_user().nickname(),
@@ -31,15 +31,16 @@ class MainHandler(webapp2.RequestHandler):
         'name':user.nickname(),
         'questions':q}
       	self.response.out.write(template.render(path, template_values))
-			# q = Question(questionId="q01",
-			# content="test on the first question",
-			# userId=users.get_current_user().email())
-			# q.created_date = datetime.datetime.now().date()
-			# q.put()
       else:
       	url = users.create_login_url(self.request.uri)
       	url_text = 'Sign In'
-      	template_values = {'url': url,'url_text': url_text}
+        q=QuestionPool.all()
+        q.order('-created_time')
+        template_values = {
+        'url': url,
+        'url_text': url_text,
+        'name':"",
+        'questions':q}
       	self.response.out.write(template.render(path, template_values))
 
 
@@ -54,11 +55,6 @@ class AddQuestionPage(webapp2.RequestHandler):
 			self.response.out.write(template.render(path, template_values))
 		else:
 			self.response.write("please sign in to create question")
-        	#self.response.out.write(template.render(path, template_values))
-        	# url = users.create_login_url(self.request.uri)
-        	#url_text = 'Sign In'
-         	#path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
-         	#template_values = {'url': url,'url_text': url_text}
 
 class CreateQuestion(webapp2.RequestHandler):
   def get(self):
@@ -82,18 +78,18 @@ class CreateQuestion(webapp2.RequestHandler):
 class ShowQuestion(webapp2.RequestHandler):
   def get(self):
     user = users.get_current_user()
-    url = users.create_logout_url('/')
-    url_text = 'Sign Out'
     questionKey=self.request.GET['key']
     path = os.path.join(os.path.dirname(__file__), 'templates/showQuestion.html')
     q = db.get(questionKey)
     a = db.GqlQuery("SELECT * FROM AnswerPool WHERE questionKey= :1 order by vote DESC",questionKey)
-    #test if current user is auther
-    if (q.userId==user.nickname()):
-      isAuthor=True
-    else:
-      isAuthor=False
-    if q:
+    # check if the user has logged in
+    if user:
+      url = users.create_logout_url('/')
+      url_text = 'Sign Out'
+      if (q.userId==user.nickname()):
+        isAuthor=True
+      else:
+        isAuthor=False
       template_values = {'user': users.get_current_user().nickname(),
       'url': url,
       'url_text': url_text,
@@ -103,7 +99,15 @@ class ShowQuestion(webapp2.RequestHandler):
       'answers':a}
       self.response.out.write(template.render(path, template_values))
     else:
-      self.response.out.write("no data")
+      url = users.create_login_url(self.request.uri)
+      url_text = 'Sign In'
+      template_values = {'url': url,
+        'url_text': url_text,
+        'name':"",
+        'question':q,
+        'isAuthor':False,
+        'answers':a}
+      self.response.out.write(template.render(path, template_values))
 
 class ShowTags(webapp2.RequestHandler):
   def get(self):
@@ -125,7 +129,11 @@ class ShowTags(webapp2.RequestHandler):
     else:
       url = users.create_login_url(self.request.uri)
       url_text = 'Sign In'
-      template_values = {'url': url,'url_text': url_text}
+      template_values = {'url': url,
+      'url_text': url_text,
+      'name':"",
+      'questions':q,
+      'tag':questionTag}
       self.response.out.write(template.render(path, template_values))
 
 class EditQuestionPage(webapp2.RequestHandler):
