@@ -7,12 +7,12 @@ import urllib
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 import os
-#from model import Question
 import datetime
 from google.appengine.ext import db
 from google.appengine.api import users
 import cgi
 from model import QuestionPool
+from model import AnswerPool
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -87,6 +87,7 @@ class ShowQuestion(webapp2.RequestHandler):
     questionKey=self.request.GET['key']
     path = os.path.join(os.path.dirname(__file__), 'templates/showQuestion.html')
     q = db.get(questionKey)
+    a = db.GqlQuery("SELECT * FROM AnswerPool WHERE questionKey= :1 order by vote DESC",questionKey)
     #test if current user is auther
     if (q.userId==user.nickname()):
       isAuthor=True
@@ -98,7 +99,8 @@ class ShowQuestion(webapp2.RequestHandler):
       'url_text': url_text,
       'name':user.nickname(),
       'question':q,
-      'isAuthor':isAuthor}
+      'isAuthor':isAuthor,
+      'answers':a}
       self.response.out.write(template.render(path, template_values))
     else:
       self.response.out.write("no data")
@@ -125,9 +127,6 @@ class ShowTags(webapp2.RequestHandler):
       url_text = 'Sign In'
       template_values = {'url': url,'url_text': url_text}
       self.response.out.write(template.render(path, template_values))
-
-  def post(self):
-    tag=self.request.get("tags")
 
 class EditQuestionPage(webapp2.RequestHandler):
   def get(self):
@@ -165,6 +164,13 @@ class UpdateQuestion(webapp2.RequestHandler):
     q.put()
     self.response.write("rewrite successfully")
 
+class CreateAnswer(webapp2.RequestHandler):
+  def post(self):
+    a=AnswerPool(questionKey=self.request.get("questionKey"),
+      content=self.request.get("answerContent"),
+      userId=self.request.get("answerUser"))
+    a.put()
+    self.response.write("answer created successfully")
 
 
 app = webapp2.WSGIApplication([
@@ -174,7 +180,8 @@ app = webapp2.WSGIApplication([
     (r'/showQuestion.*',ShowQuestion),
     (r'/showTags.*',ShowTags),
     (r'/editQuestion.*',EditQuestionPage),
-    (r'/updateQuestion.*',UpdateQuestion)
+    (r'/updateQuestion.*',UpdateQuestion),
+    (r'/createAnswer.*',CreateAnswer)
 ], debug=True)
 
 def main():

@@ -61,7 +61,13 @@
 
     <div class="container">
       <h2 class="page-header">{{question.title}}</h2>
-      <p>
+      {% if question.tag %}
+      <p>Tags:
+      {% for t in question.tag %}
+      <a href="/showTags?tags={{t}}">{{t}},</a>
+      {% endfor %}
+      </p>
+      {% endif %}
         <div class="col-sm-8 blog-main">
           <div class="blog-post">
            <div class="well well-sm">
@@ -69,7 +75,12 @@
              {% autoescape off %}
              <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{question.content|urlize|linebreaksbr }}</p>
              {% endautoescape %}
-             <p class="blog-post-meta"><i>Last Modified: {{ question.modified_time|date:"F j, Y" }}</i></p>
+             <p class="blog-post-meta">
+             {% if question.modified_time %}
+             <i>Last Modified: {{ question.modified_time|date:"F j, Y" }}</i></p>
+             {% else %}
+             <i>Last Modified: {{ question.created_time|date:"F j, Y" }}</i></p>
+             {% endif %}
             </div>
           </div>
         {% if isAuthor %}
@@ -82,6 +93,54 @@
         </div>
         </p>
     </div>
+    <!--show all the answers belong to the question-->
+    {% if answers %}
+    <div class="container">
+    <h3 class="page-header">Answers</h3>
+    {% for a in answers %}
+      <div class="col-sm-8 blog-main">
+          <h3 class="page-header"></h3>
+          <div class="well well-sm">
+             <p class="blog-post-meta"> 
+                <p class="blog-post-meta"> {{ a.created_time|date:"F j, Y" }} by <a href="#">{{ a.userId }}</a></p>
+             {% autoescape off %}
+             <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{a.content|urlize|linebreaksbr }}</p>
+             {% endautoescape %}
+             <p class="blog-post-meta">
+            {% if a.modified_time %}
+             <i>Last Modified: {{ a.modified_time|date:"F j, Y" }}</i></p>
+             {% else %}
+             <i>Last Modified: {{ a.created_time|date:"F j, Y" }}</i></p>
+             {% endif %}
+          </div>
+        {% ifequal a.userId name %}
+        <form role="form" action='/editQuestion' method="post">
+          <input type="hidden" name="key" class="form-control" value={{a.key}}>
+          <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Answer</button>
+          <button type="submit" name="delete" class="btn btn-default" value="True">Delete Answer</button>
+        </form>
+      {% endifequal %}
+    </div>
+    {% endfor %}
+    </div><!-- /.container -->
+    {% endif %}
+
+    <!--show the add answer page-->
+    <div class="container">
+    <h2 class="page-header">Add Your Answer Here</h2>
+    <div class="col-sm-8 blog-main">
+      <form role="form" action='/createAnswer' method="post">
+        <div class="form-group">
+          <label for="answer">Answer:</label>
+          <textarea class="form-control" name="answerContent" rows="10" placeholder="Enter Answer"></textarea>
+        </div>
+        <input type="hidden" name="questionKey" class="form-control" value="{{question.key}}">
+        <input type="hidden" name="answerUser" class="form-control" value="{{name}}">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+      </div>
+    </div><!-- /.container -->
+
     <div class="container">
     <h2 class="page-header"></h2>
       <footer>
