@@ -202,6 +202,42 @@ class EditAnswer(webapp2.RequestHandler):
 		else:
 		  self.response.out.write("please delete the instance")
 
+class VoteUp(webapp2.RequestHandler):
+  def get(self):
+      self.response.write("try again")
+      t=self.request.GET['type']
+      user=self.request.GET['user']
+      if (t=="question"):
+        q=db.get(self.request.GET['key'])
+        #test if the user has voted for the answer
+        #if the user has already vite down for the question
+        if (user in q.votedown_user):
+          q.votedown_user.remove(user)
+          q.voteup_user.append(user)
+          q.vote=q.vote+2
+        #if user never vote for this question
+        elif (user not in q.voteup_user):
+          q.voteup_user.append(user)
+          q.vote+=1
+        q.put()
+      else:
+        a=db.get(self.request.GET['key'])
+        #test if the user has voted for the answer
+        #if the user has already vite down for the question
+        if (user in a.votedown_user):
+          a.votedown_user.remove(user)
+          a.voteup_user.append(user)
+          a.vote=a.vote+2
+        #if user never vote for this question
+        elif (user not in a.voteup_user):
+          a.voteup_user.append(user)
+          a.vote+=1
+        a.put()
+      self.response.write("vote successfully")
+
+
+
+
 class UpdataAnswer(webapp2.RequestHandler):
 	def post(self):
 	    answerKey=self.request.get("key")
@@ -211,15 +247,43 @@ class UpdataAnswer(webapp2.RequestHandler):
 	    a.put()
 	    self.response.write("rewrite successfully")
 
-class VoteUp(webapp2.RequestHandler):
-	def get(self):
-		self.request.get("1")
-
 class VoteDown(webapp2.RequestHandler):
-	def get(self):
-		self.request.get("1")
+  def get(self):
+      self.response.write("try again")
+      t=self.request.GET['type']
+      user=self.request.GET['user']
+      if (t=="question"):
+        q=db.get(self.request.GET['key'])
+        #test if the user has voted for the answer
+        #if the user has already vite down for the question
+        if (user in q.voteup_user):
+          q.voteup_user.remove(user)
+          q.votedown_user.append(user)
+          q.vote=q.vote-2
+        #if user never vote for this question
+        elif (user not in q.votedown_user):
+          q.votedown_user.append(user)
+          q.vote-=1
+        q.put()
+      else:
+        a=db.get(self.request.GET['key'])
+        #test if the user has voted for the answer
+        #if the user has already vite down for the question
+        if (user in a.voteup_user):
+          a.voteup_user.remove(user)
+          a.votedown_user.append(user)
+          a.vote=a.vote-2
+        #if user never vote for this question
+        elif (user not in a.votedown_user):
+          a.votedown_user.append(user)
+          a.vote-=1
+        a.put()
+      self.response.write("vote successfully")
 
 
+
+def main():
+    app.run()
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -235,9 +299,6 @@ app = webapp2.WSGIApplication([
     (r'/voteUp.*',VoteUp),
     (r'/voteDown.*',VoteDown)
 ], debug=True)
-
-def main():
-    app.run()
 
 if __name__ == '__main__':
     main()

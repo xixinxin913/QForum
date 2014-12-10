@@ -10,7 +10,8 @@ class QuestionPool(db.Model):
 	tag = db.StringListProperty()
 	userId = db.StringProperty()
 	vote=db.IntegerProperty(default=0)
-	vote_user=db.StringListProperty()
+	voteup_user=db.StringListProperty()
+	votedown_user=db.StringListProperty()
 	modified_time=db.DateTimeProperty()
 
 class AnswerPool(db.Model):
@@ -19,5 +20,6 @@ class AnswerPool(db.Model):
 	created_time = db.DateTimeProperty(auto_now_add=True)
 	userId = db.StringProperty()
 	vote=db.IntegerProperty(default=0)
-	vote_user=db.StringListProperty()
+	voteup_user=db.StringListProperty()
+	votedown_user=db.StringListProperty()
 	modified_time=db.DateTimeProperty()

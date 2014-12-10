@@ -60,7 +60,7 @@
       <button type="submit" name="edit" class="btn btn-primary" value="Ture">up</button>
       <div> 
       <p></p>
-      <p class="text-center" style="font-size: 16px;">1</p>
+      <p class="text-center" style="font-size: 16px;">{{question.vote}}</p>
       </div>
       <button type="submit" name="edit" class="btn btn-primary" value="Ture">down</button> 
       </div>
@@ -91,8 +91,8 @@
           <form role="form" action='/editQuestion' method="post">
             <input type="hidden" name="key" class="form-control" value={{question.key}}>
             {% if name %}
-            <h4 class="pull-right"><a href="#"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{question.vote}}</span></a>
-            <a href="#"><b style="font-size: 18px">Down</b></a></h4>
+            <h4 class="pull-right"><a href="/voteUp?type=question&key={{question.key}}&user={{name}}"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{question.vote}}</span></a>
+            <a href="voteDown?type=question&key={{question.key}}&user={{name}}"><b style="font-size: 18px">Down</b></a></h4>
             {% endif %}
            {% if isAuthor %}
             <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Question</button>
@@ -126,8 +126,8 @@
             <form role="form" action='/editAnswer' method="post">
             <input type="hidden" name="key" class="form-control" value={{a.key}}>
             {% if name %}
-            <h4 class="pull-right"><a href="/voteUp"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{question.vote}}</span></a>
-            <a href="/voteDown"><b style="font-size: 18px">Down</b></a></h4>
+            <h4 class="pull-right"><a href="/voteUp?type=answer&key={{a.key}}&user={{name}}"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{a.vote}}</span></a>
+            <a href="/voteDown?type=answer&key={{a.key}}&user={{name}}"><b style="font-size: 18px">Down</b></a></h4>
             {% endif %}
            {% ifequal a.userId name %}
             <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Answer</button>
