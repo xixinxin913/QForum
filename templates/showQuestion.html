@@ -56,15 +56,14 @@
 
     <div class="container">
       <h2 class="page-header"> 
-      <div class="btn-group-vertical" role="group" >
+      <!--div class="btn-group-vertical" role="group" >
       <button type="submit" name="edit" class="btn btn-primary" value="Ture">up</button>
       <div> 
       <p></p>
       <p class="text-center" style="font-size: 16px;">{{question.vote}}</p>
       </div>
       <button type="submit" name="edit" class="btn btn-primary" value="Ture">down</button> 
-      </div>
-      &nbsp;&nbsp;
+      </div-->
       {{question.title}}</h2>
       {% if question.tag %}
       <p>Tags:
@@ -93,6 +92,9 @@
             {% if name %}
             <h4 class="pull-right"><a href="/voteUp?type=question&key={{question.key}}&user={{name}}"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{question.vote}}</span></a>
             <a href="voteDown?type=question&key={{question.key}}&user={{name}}"><b style="font-size: 18px">Down</b></a></h4>
+            {% else %}
+            <h4 class="pull-right"><a href="{{url}}"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{question.vote}}</span></a>
+            <a href="{{url}}"><b style="font-size: 18px">Down</b></a></h4>
             {% endif %}
            {% if isAuthor %}
             <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Question</button>

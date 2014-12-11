@@ -13,23 +13,42 @@ from google.appengine.api import users
 import cgi
 from model import QuestionPool
 from model import AnswerPool
+import time
 
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
       user = users.get_current_user()
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
+      values=self.request.GET.keys()
       # check if the user has sign in
       if user:
       	url = users.create_logout_url('/')
       	url_text = 'Sign Out'
-        q=QuestionPool.all()
-        q.order('-created_time')
+        if ("page" not in values):
+          offset=1
+        else:
+          offset=int(self.request.GET['page'])
+        # check total number of questions
+        count=db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").count()
+        # if total number of question less than 10
+        if(count <=10):
+          q=db.QuestionPool.All()
+          ifNext=False
+        # if the last page hosl less than 10 question
+        elif(count<offset*10):
+          q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
+          ifNext=False
+        else:
+          q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
+          ifNext=True
       	template_values = {'user': users.get_current_user().nickname(),
         'url': url,
         'url_text': url_text,
         'name':user.nickname(),
-        'questions':q}
+        'questions':q,
+        'offset':offset,
+        'ifNext':ifNext}
       	self.response.out.write(template.render(path, template_values))
       else:
       	url = users.create_login_url(self.request.uri)
@@ -66,7 +85,7 @@ class CreateQuestion(webapp2.RequestHandler):
   def post(self):
     questionContent=self.request.get("content")
     tags=self.request.get("tag").split(";")
-    tags=[str(var) for var in tags]
+    tags=[str(var).strip( ) for var in tags]
     q = QuestionPool(title=self.request.get("title"),
     content=questionContent,
 		userId=users.get_current_user().nickname(),
@@ -74,6 +93,8 @@ class CreateQuestion(webapp2.RequestHandler):
     )
     q.put()
     self.response.write("successfully")
+    time.sleep(2)
+    self.redirect('/')
 
 class ShowQuestion(webapp2.RequestHandler):
   def get(self):
@@ -287,6 +308,7 @@ def main():
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    (r'/page.*', MainHandler),
     ('/addQuestionPage',AddQuestionPage),
     ('/createQuestion',CreateQuestion),
     (r'/showQuestion.*',ShowQuestion),
