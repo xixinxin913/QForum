@@ -14,6 +14,8 @@ import cgi
 from model import QuestionPool
 from model import AnswerPool
 import time
+from google.appengine.api import mail
+import re
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -45,7 +47,7 @@ class MainHandler(webapp2.RequestHandler):
       	template_values = {'user': users.get_current_user().nickname(),
         'url': url,
         'url_text': url_text,
-        'name':user.nickname(),
+        'name':user.email(),
         'questions':q,
         'offset':offset,
         'ifNext':ifNext}
@@ -88,7 +90,7 @@ class CreateQuestion(webapp2.RequestHandler):
     tags=[str(var).strip( ) for var in tags]
     q = QuestionPool(title=self.request.get("title"),
     content=questionContent,
-		userId=users.get_current_user().nickname(),
+		userId=users.get_current_user().email(),
     tag=tags
     )
     q.put()
@@ -191,7 +193,9 @@ class UpdateQuestion(webapp2.RequestHandler):
     q.modified_time=datetime.datetime.now()
     q.tag=tags
     q.put()
-    self.response.write("rewrite successfully")
+    #redict to show the new question
+    time.sleep(2)
+    self.redirect('/showQuestion?key='+questionKey)
 
 class CreateAnswer(webapp2.RequestHandler):
   def post(self):
@@ -199,6 +203,25 @@ class CreateAnswer(webapp2.RequestHandler):
       content=self.request.get("answerContent"),
       userId=self.request.get("answerUser"))
     a.put()
+    #redict to show the new answer page
+    time.sleep(1)
+    self.redirect('/showQuestion?key='+a.questionKey)
+
+    q=db.get(self.request.get("questionKey"))
+    mail.send_mail(sender="Example.com Support <support@example.com>",
+              to=q.userId,
+              subject="Your account has been approved",
+              body="""
+              Dear Albert:
+
+              Your example.com account has been approved.  You can now visit
+              http://www.example.com/ and sign in using your Google Account to
+              access new features.
+
+              Please let us know if you have any questions.
+
+              The example.com Team
+              """)
     self.response.write("answer created successfully")
 
 class EditAnswer(webapp2.RequestHandler):
@@ -229,6 +252,7 @@ class VoteUp(webapp2.RequestHandler):
       t=self.request.GET['type']
       user=self.request.GET['user']
       if (t=="question"):
+        questionKey=self.request.GET['key']
         q=db.get(self.request.GET['key'])
         #test if the user has voted for the answer
         #if the user has already vite down for the question
@@ -243,6 +267,7 @@ class VoteUp(webapp2.RequestHandler):
         q.put()
       else:
         a=db.get(self.request.GET['key'])
+        questionKey=a.questionKey
         #test if the user has voted for the answer
         #if the user has already vite down for the question
         if (user in a.votedown_user):
@@ -254,19 +279,10 @@ class VoteUp(webapp2.RequestHandler):
           a.voteup_user.append(user)
           a.vote+=1
         a.put()
-      self.response.write("vote successfully")
+      #redirect to the updated vote page
+      time.sleep(1)
+      self.redirect('/showQuestion?key='+questionKey)
 
-
-
-
-class UpdataAnswer(webapp2.RequestHandler):
-	def post(self):
-	    answerKey=self.request.get("key")
-	    a=db.get(answerKey)
-	    a.content=self.request.get("content")
-	    a.modified_time=datetime.datetime.now()
-	    a.put()
-	    self.response.write("rewrite successfully")
 
 class VoteDown(webapp2.RequestHandler):
   def get(self):
@@ -275,6 +291,7 @@ class VoteDown(webapp2.RequestHandler):
       user=self.request.GET['user']
       if (t=="question"):
         q=db.get(self.request.GET['key'])
+        questionKey=self.request.GET['key']
         #test if the user has voted for the answer
         #if the user has already vite down for the question
         if (user in q.voteup_user):
@@ -288,6 +305,7 @@ class VoteDown(webapp2.RequestHandler):
         q.put()
       else:
         a=db.get(self.request.GET['key'])
+        questionKey=a.questionKey
         #test if the user has voted for the answer
         #if the user has already vite down for the question
         if (user in a.voteup_user):
@@ -300,7 +318,57 @@ class VoteDown(webapp2.RequestHandler):
           a.vote-=1
         a.put()
       self.response.write("vote successfully")
+      #redirect to the updated vote page
+      time.sleep(1)
+      self.redirect('/showQuestion?key='+questionKey)
 
+class Search(webapp2.RequestHandler):
+  def get(self):
+      text=self.request.get("text")
+      user = users.get_current_user()
+      path = os.path.join(os.path.dirname(__file__), 'templates/showSearch.html')
+      q=db.GqlQuery("SELECT * FROM QuestionPool")
+      questions=[]
+      answers=[]
+      a=db.GqlQuery("SELECT * FROM AnswerPool")
+      for var in q:
+        if (re.search(text, var.content,re.IGNORECASE)):
+          questions.append(var)
+      for var in a:
+        if (re.search(text, var.content,re.IGNORECASE)):
+          answers.append(var)
+      if user:
+        url = users.create_logout_url('/')
+        url_text = 'Sign Out'
+        template_values = {'user': users.get_current_user().email(),
+        'url': url,
+        'url_text': url_text,
+        'name':user.email(),
+        'questions':questions,
+        'keyWords':text,
+        'answers':answers}
+        self.response.out.write(template.render(path, template_values))
+      else:
+        url = users.create_login_url(self.request.uri)
+        url_text = 'Sign In'
+        template_values = {'url': url,
+        'url_text': url_text,
+        'name':"",
+        'questions':q,
+        'tag':questionTag}
+        self.response.out.write(template.render(path, template_values))
+
+
+class UpdataAnswer(webapp2.RequestHandler):
+  def post(self):
+      answerKey=self.request.get("key")
+      a=db.get(answerKey)
+      a.content=self.request.get("content")
+      a.modified_time=datetime.datetime.now()
+      a.put()
+      #redirect to the updated answer page
+      time.sleep(1)
+      self.redirect('/showQuestion?key='+a.questionKey)
 
 
 def main():
@@ -319,7 +387,8 @@ app = webapp2.WSGIApplication([
     (r'/editAnswer.*',EditAnswer),
     (r'/updateAnswer.*',UpdataAnswer),
     (r'/voteUp.*',VoteUp),
-    (r'/voteDown.*',VoteDown)
+    (r'/voteDown.*',VoteDown),
+    (r'/search.*',Search)
 ], debug=True)
 
 if __name__ == '__main__':
