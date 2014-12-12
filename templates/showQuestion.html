@@ -130,6 +130,9 @@
             {% if name %}
             <h4 class="pull-right"><a href="/voteUp?type=answer&key={{a.key}}&user={{name}}"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{a.vote}}</span></a>
             <a href="/voteDown?type=answer&key={{a.key}}&user={{name}}"><b style="font-size: 18px">Down</b></a></h4>
+            {% else %}
+            <h4 class="pull-right"><a href="{{url}}"><b style="font-size: 18px">Up</b> <span class="badge" style="font-size: 20px">{{a.vote}}</span></a>
+            <a href="{{url}}"><b style="font-size: 18px">Down</b></a></h4>
             {% endif %}
            {% ifequal a.userId name %}
             <button type="submit" name="edit" class="btn btn-default" value="Ture">Edit Answer</button>

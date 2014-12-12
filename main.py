@@ -23,27 +23,27 @@ class MainHandler(webapp2.RequestHandler):
       user = users.get_current_user()
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       values=self.request.GET.keys()
+      if ("page" not in values):
+          offset=1
+      else:
+          offset=int(self.request.GET['page'])
+      # check total number of questions
+      count=db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").count()
+      # if total number of question less than 10
+      if(count <=10):
+        q=db.QuestionPool.All()
+        ifNext=False
+      # if the last page hosl less than 10 question
+      elif(count<offset*10):
+        q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
+        ifNext=False
+      else:
+        q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
+        ifNext=True
       # check if the user has sign in
       if user:
       	url = users.create_logout_url('/')
       	url_text = 'Sign Out'
-        if ("page" not in values):
-          offset=1
-        else:
-          offset=int(self.request.GET['page'])
-        # check total number of questions
-        count=db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").count()
-        # if total number of question less than 10
-        if(count <=10):
-          q=db.QuestionPool.All()
-          ifNext=False
-        # if the last page hosl less than 10 question
-        elif(count<offset*10):
-          q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
-          ifNext=False
-        else:
-          q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
-          ifNext=True
       	template_values = {'user': users.get_current_user().nickname(),
         'url': url,
         'url_text': url_text,
@@ -55,13 +55,13 @@ class MainHandler(webapp2.RequestHandler):
       else:
       	url = users.create_login_url(self.request.uri)
       	url_text = 'Sign In'
-        q=QuestionPool.all()
-        q.order('-created_time')
         template_values = {
         'url': url,
         'url_text': url_text,
         'name':"",
-        'questions':q}
+        'questions':q,
+        'offset':offset,
+        'ifNext':ifNext}
       	self.response.out.write(template.render(path, template_values))
 
 
@@ -354,8 +354,9 @@ class Search(webapp2.RequestHandler):
         template_values = {'url': url,
         'url_text': url_text,
         'name':"",
-        'questions':q,
-        'tag':questionTag}
+        'questions':questions,
+        'keyWords':text,
+        'answers':answers}
         self.response.out.write(template.render(path, template_values))
 
 
