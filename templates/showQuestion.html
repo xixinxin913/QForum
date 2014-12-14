@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="http://getbootstrap.com/favicon.ico">
-
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
     <title>QForum</title>
 
     <!-- Bootstrap core CSS -->
@@ -46,7 +46,7 @@
             <li class="active"><a href="/">Home</a></li>
             {% if name %}
             <li><a href="/addQuestionPage">Create Question</a></li>
-            <li><a href="/">Hello {{name}}</a></li>
+            <li><a href="/showFollow">My Follows</a></li>
             {% endif %}
             <li><a href={{url}}>{{url_text}}</a></li>
           </ul>
@@ -56,14 +56,17 @@
 
     <div class="container">
       <h2 class="page-header"> 
-      <!--div class="btn-group-vertical" role="group" >
-      <button type="submit" name="edit" class="btn btn-primary" value="Ture">up</button>
-      <div> 
-      <p></p>
-      <p class="text-center" style="font-size: 16px;">{{question.vote}}</p>
-      </div>
-      <button type="submit" name="edit" class="btn btn-primary" value="Ture">down</button> 
-      </div-->
+      {% if name  %}
+      <div class="btn-group-vertical" role="group">
+      <form role="form" action='/followQuestion' method="post">
+          <input type="hidden" name="user" class="form-control" value={{name}}>
+          <input type="hidden" name="key" class="form-control" value={{question.key}}>
+        <button type="submit" class="btn btn-primary">
+          <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>  Follow
+        </button> 
+      </form>
+      {% endif %}
+      </div> &nbsp;
       {{question.title}}</h2>
       {% if question.tag %}
       <p>Tags:
@@ -77,7 +80,7 @@
             <div class="well well-sm">
                <p class="blog-post-meta"> {{ question.created_time|date:"F j, Y" }} by <a href="#">{{ question.userId }}</a></p>
                {% autoescape off %}
-               <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{question.content|urlize|linebreaksbr }}</p>
+               <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{question.showImage|urlize|linebreaksbr }}</p>
                {% endautoescape %}
                <p class="blog-post-meta">
                {% if question.modified_time %}
@@ -116,7 +119,7 @@
              <p class="blog-post-meta"> 
                 <p class="blog-post-meta"> {{ a.created_time|date:"F j, Y" }} by <a href="#">{{ a.userId }}</a></p>
              {% autoescape off %}
-             <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{a.content|urlize|linebreaksbr }}</p>
+             <p style="font-family: 'Times New Roman';font-weight: normal;font-size: 17px;">{{a.showImage|urlize|linebreaksbr }}</p>
              {% endautoescape %}
              <p class="blog-post-meta">
             {% if a.modified_time %}

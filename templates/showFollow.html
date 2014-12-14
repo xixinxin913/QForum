@@ -62,7 +62,7 @@
     </nav>
 
     <div class="container">
-      <h2 class="page-header">Tags: "{{tag}}"</h2>
+      <h2 class="page-header">Followed by: {{name}}</h2>
         <div class="bs-table" class="text-center">        
           <table class="table table-hover">
             <thead>
@@ -77,14 +77,14 @@
             {% for q in questions %}
               <tbody>
                 <tr>
-                  <td class="col-md-6"><a href="/showQuestion?key={{ q.key }}"><h4>{{q.title }}</h4></a><em><small>
-                  {% if q.content|length > 500 %}
-                  {{q.content|slice:":500"}}</small></em><br>...</td>
+                  <td class="col-md-6"><a href="/showQuestion?key={{ q.key }}"><h4>{{q.question.title }}</h4></a><em><small>
+                  {% if q.question.content|length > 500 %}
+                  {{q.question.content|slice:":500"}}</small></em><br>...</td>
                   {% else %}
-                  {{q.content}}</small></em></td>
+                  {{q.question.content}}</small></em></td>
                   {% endif %}
                   <td class="col-md-1" style="vertical-align:middle"> 
-                  {% for v in q.tag %}
+                  {% for v in q.question.tag %}
                     <p>
                      <form role="form" action='/showTags' method="get">
                       <input type="hidden" name="tags" class="form-control" value={{v}}>
@@ -93,9 +93,9 @@
                     </p>
                   {% endfor %}
                   </td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.vote}}</td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.userId}}</td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.created_time|date:"M/d"|upper }}</td>
+                  <td class="col-md-1" style="vertical-align:middle">{{q.question.vote}}</td>
+                  <td class="col-md-1" style="vertical-align:middle">{{q.question.userId}}</td>
+                  <td class="col-md-1" style="vertical-align:middle">{{q.question.created_time|date:"M/d"|upper }}</td>
                 </tr>
               </tbody>
             {% endfor %}

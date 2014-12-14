@@ -13,6 +13,7 @@ from google.appengine.api import users
 import cgi
 from model import QuestionPool
 from model import AnswerPool
+from model import FollowPool
 import time
 from google.appengine.api import mail
 import re
@@ -44,7 +45,7 @@ class MainHandler(webapp2.RequestHandler):
       if user:
       	url = users.create_logout_url('/')
       	url_text = 'Sign Out'
-      	template_values = {'user': users.get_current_user().nickname(),
+      	template_values = {'user': users.get_current_user().email(),
         'url': url,
         'url_text': url_text,
         'name':user.email(),
@@ -72,18 +73,15 @@ class AddQuestionPage(webapp2.RequestHandler):
 			url = users.create_logout_url('/')
 			url_text = 'Sign Out'
 			path = os.path.join(os.path.dirname(__file__), 'templates/question.html')
-			template_values = {'user': users.get_current_user().nickname(),'url': url,'url_text': url_text,'name':user.nickname()}
+			template_values = {'user': users.get_current_user().email(),'url': url,'url_text': url_text,'name':user.email()}
 			self.response.out.write(template.render(path, template_values))
 		else:
 			self.response.write("please sign in to create question")
 
 class CreateQuestion(webapp2.RequestHandler):
   def get(self):
-    title=self.request.get("title")
-    if (title==""):
-      self.response.write("not add question")
-    else:
-      self.response.write("successfully add question")
+    self.error(404)
+    return
   def post(self):
     questionContent=self.request.get("content")
     tags=self.request.get("tag").split(";")
@@ -109,14 +107,14 @@ class ShowQuestion(webapp2.RequestHandler):
     if user:
       url = users.create_logout_url('/')
       url_text = 'Sign Out'
-      if (q.userId==user.nickname()):
+      if (q.userId==user.email()):
         isAuthor=True
       else:
         isAuthor=False
-      template_values = {'user': users.get_current_user().nickname(),
+      template_values = {'user': users.get_current_user().email(),
       'url': url,
       'url_text': url_text,
-      'name':user.nickname(),
+      'name':user.email(),
       'question':q,
       'isAuthor':isAuthor,
       'answers':a}
@@ -142,10 +140,10 @@ class ShowTags(webapp2.RequestHandler):
     if user:
       url = users.create_logout_url('/')
       url_text = 'Sign Out'
-      template_values = {'user': users.get_current_user().nickname(),
+      template_values = {'user': users.get_current_user().email(),
       'url': url,
       'url_text': url_text,
-      'name':user.nickname(),
+      'name':user.email(),
       'questions':q,
       'tag':questionTag}
       self.response.out.write(template.render(path, template_values))
@@ -161,7 +159,8 @@ class ShowTags(webapp2.RequestHandler):
 
 class EditQuestionPage(webapp2.RequestHandler):
   def get(self):
-    self.response.out.write("begin edit")
+    self.error(404)
+    return 1
   def post(self):
     user = users.get_current_user()
     url = users.create_logout_url('/')
@@ -170,10 +169,10 @@ class EditQuestionPage(webapp2.RequestHandler):
     edit=self.request.get("edit")
     if edit:
       q = db.get(questionKey)
-      template_values = {'user': users.get_current_user().nickname(),
+      template_values = {'user': users.get_current_user().email(),
       'url': url,
       'url_text': url_text,
-      'name':user.nickname(),
+      'name':user.email(),
       'question':q}
       path = os.path.join(os.path.dirname(__file__), 'templates/editQuestion.html')
       self.response.out.write(template.render(path, template_values))
@@ -235,10 +234,10 @@ class EditAnswer(webapp2.RequestHandler):
 		questionKey=urllib.unquote(self.request.get("key"))
 		edit=self.request.get("edit")
 		if edit:
-		  template_values = {'user': users.get_current_user().nickname(),
+		  template_values = {'user': users.get_current_user().email(),
 		  'url': url,
 		  'url_text': url_text,
-		  'name':user.nickname(),
+		  'name':user.email(),
 		  'answer':a,
 		  'question':q}
 		  path = os.path.join(os.path.dirname(__file__), 'templates/editAnswer.html')
@@ -371,6 +370,33 @@ class UpdataAnswer(webapp2.RequestHandler):
       time.sleep(1)
       self.redirect('/showQuestion?key='+a.questionKey)
 
+class Follow(webapp2.RequestHandler):
+  def get(self):
+    self.response.write("please sign in")
+  def post(self):
+    f=FollowPool(question=db.get(self.request.get("key")),
+      userId=self.request.get("user"))
+    f.put()
+    time.sleep(1)
+    self.redirect('/showQuestion?key='+self.request.get("key"))
+
+class ShowFollow(webapp2.RequestHandler):
+  def get(self):
+    user = users.get_current_user()
+    f = db.GqlQuery("SELECT * FROM FollowPool where userId= :1" ,user.email())
+    path = os.path.join(os.path.dirname(__file__), 'templates/showFollow.html')
+    if user:
+      url = users.create_logout_url('/')
+      url_text = 'Sign Out'
+      template_values = {'user': users.get_current_user().email(),
+      'url': url,
+      'url_text': url_text,
+      'name':user.email(),
+      'questions':f}
+      self.response.out.write(template.render(path, template_values))
+    else:
+      self.response.write("please sign in")
+
 
 def main():
     app.run()
@@ -389,7 +415,9 @@ app = webapp2.WSGIApplication([
     (r'/updateAnswer.*',UpdataAnswer),
     (r'/voteUp.*',VoteUp),
     (r'/voteDown.*',VoteDown),
-    (r'/search.*',Search)
+    (r'/search.*',Search),
+    (r'/followQuestion.*',Follow),
+    (r'/showFollow.*',ShowFollow)
 ], debug=True)
 
 if __name__ == '__main__':
