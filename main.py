@@ -6,6 +6,8 @@ import webapp2
 import urllib
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext import blobstore
 import os
 import datetime
 from google.appengine.ext import db
@@ -398,6 +400,41 @@ class ShowFollow(webapp2.RequestHandler):
       self.response.write("please sign in")
 
 
+class UploadImage(blobstore_handlers.BlobstoreUploadHandler,webapp2.RequestHandler):
+  def get(self):
+    user = users.get_current_user()
+    path = os.path.join(os.path.dirname(__file__), 'templates/uploadImage.html')
+    upload_url=blobstore.create_upload_url('/uploadImage')
+    blob = blobstore.BlobInfo.all()
+    if user:
+      url = users.create_logout_url('/')
+      url_text = 'Sign Out'
+      template_values = {'user': users.get_current_user().email(),
+      'url': url,
+      'url_text': url_text,
+      'name':user.email(),
+      'blob':blob,
+      'upload_url':upload_url}
+      self.response.out.write(template.render(path, template_values))
+    else:
+      self.response.write("please sign in")
+
+  def post(self):
+    try:
+      upload = self.get_uploads('file')
+      time.sleep(1)
+      self.redirect('/uploadImage')
+    except:
+      self.redirect('/upload_failure.html')
+
+class ShowImage(blobstore_handlers.BlobstoreDownloadHandler):
+    def get(self, blob_key):
+        if not blobstore.get(blob_key):
+            self.error(404)
+        else:
+            self.send_blob(blobstore.BlobInfo.get(blob_key))
+
+
 def main():
     app.run()
 
@@ -417,7 +454,9 @@ app = webapp2.WSGIApplication([
     (r'/voteDown.*',VoteDown),
     (r'/search.*',Search),
     (r'/followQuestion.*',Follow),
-    (r'/showFollow.*',ShowFollow)
+    (r'/showFollow.*',ShowFollow),
+    (r'/uploadImage.*',UploadImage),
+    (r'/showImage/([^/]+)/?.*',ShowImage)
 ], debug=True)
 
 if __name__ == '__main__':

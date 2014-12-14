@@ -43,10 +43,11 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/">Home</a></li>
             {% if name %}
             <li><a href="/addQuestionPage">Create Question</a></li>
-            <li><a href="/showFollow">My Follows</a></li>
+            <li><a href="/uploadImage">Upload Image</a></li>
+            <li class="active"><a href="/showFollow">My Follows</a></li>
             {% endif %}
             <li><a href={{url}}>{{url_text}}</a></li>
             <!--li class="dropdown">
