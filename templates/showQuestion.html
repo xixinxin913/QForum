@@ -56,18 +56,25 @@
     </nav>
 
     <div class="container">
-      <h2 class="page-header"> 
-      {% if name  %}
+      <h2 class="page-header">
+          {% if name  %}
       <div class="btn-group-vertical" role="group">
-      <form role="form" action='/followQuestion' method="post">
-          <input type="hidden" name="user" class="form-control" value={{name}}>
-          <input type="hidden" name="key" class="form-control" value={{question.key}}>
-        <button type="submit" class="btn btn-primary">
-          <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>  Follow
-        </button> 
-      </form>
+         <form role="form" action='/followQuestion' method="post">
+            <input type="hidden" name="user" class="form-control" value={{name}}>
+            <input type="hidden" name="key" class="form-control" value={{question.key}}>
+            <button type="submit" class="btn btn-primary sm">
+              <span class="glyphicon glyphicon-heart" aria-hidden="true"></span>  Follow
+            </button> 
+        </form>
+        <form role="form" action='/RSS' method="post">
+            <input type="hidden" name="user" class="form-control" value={{name}}>
+            <input type="hidden" name="key" class="form-control" value={{question.key}}>
+            <button type="submit" class="btn btn-primary sm">
+              <span class="glyphicon glyphicon-star" aria-hidden="true"></span>  RSS &nbsp; &nbsp;
+            </button>
+        </form> 
       </div> &nbsp;
-      {% endif %}
+      {% endif %} 
       {{question.title}}</h2>
       {% if question.tag %}
       <p>Tags:

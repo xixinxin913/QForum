@@ -26,30 +26,11 @@ class MainHandler(webapp2.RequestHandler):
       user = users.get_current_user()
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       values=self.request.GET.keys()
-<<<<<<< HEAD
-
-=======
->>>>>>> experiemnt
       if ("page" not in values):
           offset=1
       else:
           offset=int(self.request.GET['page'])
       # check total number of questions
-<<<<<<< HEAD
-	  # if total number of question less than 10
-	  count=db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").count()
-	  if(count <=10):
-		  q=db.QuestionPool.All()
-		  ifNext=False
-	   # if the last page hosl less than 10 question
-	  elif(count<offset*10):
-		  q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
-		  ifNext=False
-	  else:
-		  q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
-		  ifNext=True
-      
-=======
       count=db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").count()
       # if total number of question less than 10
       if(count <=10):
@@ -62,17 +43,12 @@ class MainHandler(webapp2.RequestHandler):
       else:
         q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
         ifNext=True
->>>>>>> experiemnt
       # check if the user has sign in
       if user:
       	url = users.create_logout_url('/')
       	url_text = 'Sign Out'
-<<<<<<< HEAD
 
-      	template_values = {'user': users.get_current_user().nickname(),
-=======
       	template_values = {'user': users.get_current_user().email(),
->>>>>>> experiemnt
         'url': url,
         'url_text': url_text,
         'name':user.email(),
@@ -236,17 +212,17 @@ class CreateAnswer(webapp2.RequestHandler):
     q=db.get(self.request.get("questionKey"))
     mail.send_mail(sender="Example.com Support <support@example.com>",
               to=q.userId,
-              subject="Your account has been approved",
+              subject="New answer has been added",
               body="""
-              Dear Albert:
+              Dear User:
 
-              Your example.com account has been approved.  You can now visit
-              http://www.example.com/ and sign in using your Google Account to
-              access new features.
+              Your question receives a new answer.  You can now visit
+              http://wxsamy123.appspot.com/ and sign in using your Google Account to
+              access the questions.
 
               Please let us know if you have any questions.
 
-              The example.com Team
+              The QForum Team
               """)
     self.response.write("answer created successfully")
 
@@ -460,6 +436,23 @@ class ShowImage(blobstore_handlers.BlobstoreDownloadHandler):
         else:
             self.send_blob(blobstore.BlobInfo.get(blob_key))
 
+class RSS(webapp2.RequestHandler):
+  def post(self):
+    self.response.write("please sign in")
+  def post(self):
+    questionKey=self.request.get("key")
+    path = os.path.join(os.path.dirname(__file__), 'templates/rss.xml')
+    host="http://wxsamy123.appsopt.com/showQuestion?key="+self.request.get("key")
+    q = db.get(questionKey)
+    a = db.GqlQuery("SELECT * FROM AnswerPool WHERE questionKey= :1 order by vote DESC",questionKey)
+    # check if the user has logged in
+    template_values = {'host': host,
+    'question':q,
+    'answers':a}
+    self.response.headers["Content-Type"] = 'application/rss+xml'
+    self.response.out.write(template.render(path, template_values))
+    #self.redirect('/showQuestion?key='+self.request.get("key"))
+
 
 def main():
     app.run()
@@ -482,7 +475,8 @@ app = webapp2.WSGIApplication([
     (r'/followQuestion.*',Follow),
     (r'/showFollow.*',ShowFollow),
     (r'/uploadImage.*',UploadImage),
-    (r'/showImage/([^/]+)/?.*',ShowImage)
+    (r'/showImage/([^/]+)/?.*',ShowImage),
+    (r'/RSS.*',RSS)
 ], debug=True)
 
 if __name__ == '__main__':

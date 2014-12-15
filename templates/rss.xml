@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+
+<channel>
+  <item>
+    <question>
+        <title>{{question.title}}</title>
+        <tag>{{question.showTag}}</tag>
+        <content>{{question.content }}</content>
+        <link>{{host}}</link>
+        <createtime>{{question.created_time|date:"F j, Y"}}</createtim>
+        <modifytime>{{ question.modified_time|date:"F j, Y" }}</modifytime>
+        <author>{{question.userId }}</author>
+        <vote>{{question.vote}}</vote>
+   </question>
+  </item>
+   {% for a in answers %}
+  <item>
+   <answer>
+        <content>{{a.content}}</content>
+        <createtime>{{a.created_time|date:"F j, Y"}}</createtime>
+        <modifytime>{{a.modified_time|date:"F j, Y"}}</modifytime>
+        <author>{{a.userId}}</author>
+        <vote>{{a.vote}}</vote>
+   </answer>
+  </item>
+{% endfor %}
+</channel>
+</rss>
+
+
