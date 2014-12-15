@@ -37,7 +37,7 @@ class MainHandler(webapp2.RequestHandler):
         q=db.QuestionPool.All()
         ifNext=False
       # if the last page hosl less than 10 question
-      elif(count<offset*10):
+      elif(count<=offset*10):
         q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
         ifNext=False
       else:
@@ -429,6 +429,7 @@ class UploadImage(blobstore_handlers.BlobstoreUploadHandler,webapp2.RequestHandl
 
 class ShowImage(blobstore_handlers.BlobstoreDownloadHandler):
     def get(self, blob_key):
+        #blobstore.delete(blob_key)
         if not blobstore.get(blob_key):
             self.error(404)
         else:

@@ -57,6 +57,7 @@
 
     <div class="container">
       <h2 class="page-header">Upload Image:</h2>
+      <div class="col-sm-8 blog-main">
         <form class="form-horizontal" action="{{upload_url}}" method="POST" enctype="multipart/form-data">
         <div class="form-group">
           <label for="file">File:</label>
@@ -65,24 +66,29 @@
             <p class="help-block">Upload Image Here</p>
           </div>
         </div>
-         
         <button class="btn btn-default" type="submit" name="submit">Upload</button>
-        <hr>
-      </form>  
+      </form> 
+      </div>
+      </div>
+    <div class="container"> 
+     <h2 class="page-header">Image Repository:</h2>
         <div class="row">
           {%for b in blob %}
           <div class="col-6 col-sm-6 col-lg-4">
              <div class="thumbnail">
-              <a href="/showImage/{{b.key}}/{{b.filename}}">
+
               <img src="/showImage/{{b.key}}/{{b.filename}}">
-             <img data-src="holder.js/300x300">
+             <!--img data-src="holder.js/300x300"-->
+             
              <div class="caption">
-               <h3>{{b.filename}}</h3>
-               <p>/showImage/{{b.key}}/{{b.filename}}</p>
-               </div>
-               </div>
+                <a href="/showImage/{{b.key}}/{{b.filename}}">
+                 <h4>{{b.filename}}</h4>
+                </a>
+             </div>
+               <!--p><small><em>/showImage/{{b.key}}/{{b.filename}}</em></small>></p-->
+            </div>
           </div>
-          </a>
+          
         {%endfor%}
       </div> <!--row-->
 
