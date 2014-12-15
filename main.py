@@ -30,18 +30,33 @@ class MainHandler(webapp2.RequestHandler):
           offset=1
       else:
           offset=int(self.request.GET['page'])
+
+      if("sort" not in values):
+        sort=False
+      else:
+        sort=True
+      #self.response.write(sort)
       # check total number of questions
-      count=db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").count()
+      count=db.GqlQuery("SELECT * FROM QuestionPool").count()
       # if total number of question less than 10
       if(count <=10):
-        q=db.QuestionPool.All()
+        if(sort):
+          q=db.GqlQuery("SELECT * FROM QuestionPool order by vote DESC, created_time DESC")
+        else:
+          q=db.QuestionPool.All()
         ifNext=False
       # if the last page hosl less than 10 question
       elif(count<=offset*10):
-        q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
+        if(sort):
+          q=db.GqlQuery("SELECT * FROM QuestionPool order by vote DESC, created_time DESC").fetch(10,(offset-1)*10)
+        else:
+          q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
         ifNext=False
       else:
-        q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
+        if(sort):
+          q=db.GqlQuery("SELECT * FROM QuestionPool ORDER BY vote DESC, created_time DESC").fetch(10,(offset-1)*10)
+        else:
+          q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
         ifNext=True
       # check if the user has sign in
       if user:
@@ -451,7 +466,6 @@ class RSS(webapp2.RequestHandler):
     'answers':a}
     self.response.headers["Content-Type"] = 'application/rss+xml'
     self.response.out.write(template.render(path, template_values))
-    #self.redirect('/showQuestion?key='+self.request.get("key"))
 
 
 def main():
@@ -476,7 +490,8 @@ app = webapp2.WSGIApplication([
     (r'/showFollow.*',ShowFollow),
     (r'/uploadImage.*',UploadImage),
     (r'/showImage/([^/]+)/?.*',ShowImage),
-    (r'/RSS.*',RSS)
+    (r'/RSS.*',RSS),
+    (r'/sort.*',MainHandler)
 ], debug=True)
 
 if __name__ == '__main__':

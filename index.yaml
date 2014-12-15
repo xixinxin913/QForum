@@ -20,3 +20,27 @@ indexes:
   properties:
   - name: userId
   - name: question
+
+- kind: QuestionPool
+  properties:
+  - name: created_time
+  - name: vote
+    direction: desc
+
+- kind: QuestionPool
+  properties:
+  - name: vote
+  - name: created_time
+
+- kind: QuestionPool
+  properties:
+  - name: vote
+  - name: created_time
+    direction: desc
+
+- kind: QuestionPool
+  properties:
+  - name: vote
+    direction: desc
+  - name: created_time
+    direction: desc
