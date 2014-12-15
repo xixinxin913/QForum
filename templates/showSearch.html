@@ -50,20 +50,22 @@
             <li><a href="/showFollow">My Follows</a></li>
             {% endif %}
             <li><a href={{url}}>{{url_text}}</a></li>
+            <!--li class="dropdown">
+                <a href="/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="/addQuestionPage">Create Question</a></li>
+                  <li><a href="/">My Question</a></li>
+                </ul>
+            </li-->
           </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
     <div class="container">
-      <h2 class="page-header"> <form class="form-inline" role="form" action="/search" method="get">
-          <div class="form-group">
-          <label> Search for Content: </label>
-          <input name="text" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form></h2>
-        <div class="bs-table" class="text-center">        
+      <h2 class="page-header">Search Keywords: "{{keyWords}}"</h2>
+      {% if questions %}
+        <div class="bs-table" class="text-center">       
           <table class="table table-hover">
             <thead>
               <tr>
@@ -77,22 +79,15 @@
             {% for q in questions %}
               <tbody>
                 <tr>
-                  <td class="col-md-6"><a href="/showQuestion?key={{ q.key }}"><h4>{{q.title }}</h4></a><em><small>
-                  {% if q.content|length > 500 %}
-                  {{q.content|slice:":500"}}</small></em><br>...</td>
-                  {% else %}
-                  {{q.content}}</small></em></td>
-                  {% endif %}
+                  <td class="col-md-6"><a href="/showQuestion?key={{ q.key }}"><h4>{{q.title }}</h4></a><em><small>{{q.content|slice:":500"}}</small></em> ...</td>
                   <td class="col-md-1" style="vertical-align:middle"> 
                   {% for v in q.tag %}
-                  {% if v != "" %}
                     <p>
                      <form role="form" action='/showTags' method="get">
-                      <input type="hidden" name="tags" class="form-control" value="{{v}}">
+                      <input type="hidden" name="tags" class="form-control" value={{v}}>
                        <button type="submit" class="btn btn-primary btn-xs">{{v}}</button>
                      </form>
                     </p>
-                  {% endif %}
                   {% endfor %}
                   </td>
                   <td class="col-md-1" style="vertical-align:middle">{{q.vote}}</td>
@@ -103,17 +98,32 @@
             {% endfor %}
           </table>
       </div>
-<nav>
-  <ul class="pager">
-    {% if offset != 1 %}
-    <li class="previous"><a href="/?page={{offset|add:"-1"}}"><span aria-hidden="true">&larr;</span> Newer</a></li>
-    {% endif %}
-    {% if ifNext %}
-    <li class="next"><a href="/?page={{offset|add:"1"}}">Older <span aria-hidden="true">&rarr;</span></a></li>
-    {% endif %}
-  </ul>
-</nav>
-
+      {% endif %}
+      <br><br>
+      {% if answers %}
+      <div class="bs-table" class="text-center">       
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Answer</th>
+                <th>Vote</th>
+                <th>Post By</th>
+                <th>Created On</th>
+              </tr>
+            </thead>
+            {% for a in answers %}
+              <tbody>
+                <tr>
+                  <td class="col-md-7"><a href="/showQuestion?key={{ a.questionKey }}"><h4>Answer Content</h4></a><em><small>{{a.content|slice:":500"}}</small></em> ...</td>
+                  <td class="col-md-1" style="vertical-align:middle">{{a.vote}}</td>
+                  <td class="col-md-1" style="vertical-align:middle">{{a.userId}}</td>
+                  <td class="col-md-1" style="vertical-align:middle">{{a.created_time|date:"M/d"|upper }}</td>
+                </tr>
+              </tbody>
+            {% endfor %}
+          </table>
+      </div>
+      {% endif %}
     <h2 class="page-header"></h2>
     <!--IMG SRC="http://www.videoinspiration.net/blog/wp-content/uploads/2014/09/Friendship.jpg" ALT="some text" WIDTH=32 HEIGHT=32-->
       <footer>

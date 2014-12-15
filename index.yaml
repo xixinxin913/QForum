@@ -15,3 +15,8 @@ indexes:
   - name: questionKey
   - name: vote
     direction: desc
+
+- kind: FollowPool
+  properties:
+  - name: userId
+  - name: question

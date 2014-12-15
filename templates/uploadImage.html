@@ -43,10 +43,10 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/">Home</a></li>
             {% if name %}
             <li><a href="/addQuestionPage">Create Question</a></li>
-            <li><a href="/uploadImage">Upload Image</a></li>
+            <li class="active"><a href="/uploadImage">Upload Image</a></li>
             <li><a href="/showFollow">My Follows</a></li>
             {% endif %}
             <li><a href={{url}}>{{url_text}}</a></li>
@@ -56,63 +56,42 @@
     </nav>
 
     <div class="container">
-      <h2 class="page-header"> <form class="form-inline" role="form" action="/search" method="get">
-          <div class="form-group">
-          <label> Search for Content: </label>
-          <input name="text" class="form-control" placeholder="Search">
+      <h2 class="page-header">Upload Image:</h2>
+      <div class="col-sm-8 blog-main">
+        <form class="form-horizontal" action="{{upload_url}}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="file">File:</label>
+          <div>
+            <input type="file" name="file" >
+            <p class="help-block">Upload Image Here</p>
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form></h2>
-        <div class="bs-table" class="text-center">        
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Questions</th>
-                <th>Tags</th>
-                <th>Vote</th>
-                <th>Post By</th>
-                <th>Created On</th>
-              </tr>
-            </thead>
-            {% for q in questions %}
-              <tbody>
-                <tr>
-                  <td class="col-md-6"><a href="/showQuestion?key={{ q.key }}"><h4>{{q.title }}</h4></a><em><small>
-                  {% if q.content|length > 500 %}
-                  {{q.content|slice:":500"}}</small></em><br>...</td>
-                  {% else %}
-                  {{q.content}}</small></em></td>
-                  {% endif %}
-                  <td class="col-md-1" style="vertical-align:middle"> 
-                  {% for v in q.tag %}
-                  {% if v != "" %}
-                    <p>
-                     <form role="form" action='/showTags' method="get">
-                      <input type="hidden" name="tags" class="form-control" value="{{v}}">
-                       <button type="submit" class="btn btn-primary btn-xs">{{v}}</button>
-                     </form>
-                    </p>
-                  {% endif %}
-                  {% endfor %}
-                  </td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.vote}}</td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.userId}}</td>
-                  <td class="col-md-1" style="vertical-align:middle">{{q.created_time|date:"M/d"|upper }}</td>
-                </tr>
-              </tbody>
-            {% endfor %}
-          </table>
+        </div>
+        <button class="btn btn-default" type="submit" name="submit">Upload</button>
+      </form> 
       </div>
-<nav>
-  <ul class="pager">
-    {% if offset != 1 %}
-    <li class="previous"><a href="/?page={{offset|add:"-1"}}"><span aria-hidden="true">&larr;</span> Newer</a></li>
-    {% endif %}
-    {% if ifNext %}
-    <li class="next"><a href="/?page={{offset|add:"1"}}">Older <span aria-hidden="true">&rarr;</span></a></li>
-    {% endif %}
-  </ul>
-</nav>
+      </div>
+    <div class="container"> 
+     <h2 class="page-header">Image Repository:</h2>
+        <div class="row">
+          {%for b in blob %}
+          <div class="col-6 col-sm-6 col-lg-4">
+             <div class="thumbnail">
+
+              <img src="/showImage/{{b.key}}/{{b.filename}}">
+             <!--img data-src="holder.js/300x300"-->
+             
+             <div class="caption">
+                <a href="/showImage/{{b.key}}/{{b.filename}}">
+                 <h4>{{b.filename}}</h4>
+                </a>
+             </div>
+               <!--p><small><em>/showImage/{{b.key}}/{{b.filename}}</em></small>></p-->
+            </div>
+          </div>
+          
+        {%endfor%}
+      </div> <!--row-->
+
 
     <h2 class="page-header"></h2>
     <!--IMG SRC="http://www.videoinspiration.net/blog/wp-content/uploads/2014/09/Friendship.jpg" ALT="some text" WIDTH=32 HEIGHT=32-->
