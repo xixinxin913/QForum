@@ -23,11 +23,19 @@ from google.appengine.api import mail
 import re
 
 
+"""
+retrieve all the questionlist in the database
+@return redirct to the homepage
+"""
 class MainHandler(webapp2.RequestHandler):
     def get(self):
       user = users.get_current_user()
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       values=self.request.GET.keys()
+      '''
+      q=QuestionPool(title="test",content="test")
+      q.put()
+      '''
       if ("page" not in values):
           offset=1
       else:
@@ -37,6 +45,7 @@ class MainHandler(webapp2.RequestHandler):
         sort=False
       else:
         sort=True
+      ifNext=True
       #self.response.write(sort)
       # check total number of questions
       count=db.GqlQuery("SELECT * FROM QuestionPool").count()
@@ -45,7 +54,7 @@ class MainHandler(webapp2.RequestHandler):
         if(sort):
           q=db.GqlQuery("SELECT * FROM QuestionPool order by vote DESC, created_time DESC")
         else:
-          q=db.QuestionPool.All()
+          q=db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC")
         ifNext=False
       # if the last page hosl less than 10 question
       elif(count<=offset*10):
@@ -59,7 +68,6 @@ class MainHandler(webapp2.RequestHandler):
           q=db.GqlQuery("SELECT * FROM QuestionPool ORDER BY vote DESC, created_time DESC").fetch(10,(offset-1)*10)
         else:
           q = db.GqlQuery("SELECT * FROM QuestionPool order by created_time DESC").fetch(10,(offset-1)*10)
-        ifNext=True
       # check if the user has sign in
       if user:
       	url = users.create_logout_url('/')
@@ -86,6 +94,9 @@ class MainHandler(webapp2.RequestHandler):
       	self.response.out.write(template.render(path, template_values))
 
 
+"""
+show the page for creating new question
+"""
 class AddQuestionPage(webapp2.RequestHandler):
 	def get(self):
 		user = users.get_current_user()
@@ -98,6 +109,11 @@ class AddQuestionPage(webapp2.RequestHandler):
 		else:
 			self.response.write("please sign in to create question")
 
+
+"""
+store the new question in the database
+@return redirct to the home page
+"""
 class CreateQuestion(webapp2.RequestHandler):
   def get(self):
     self.error(404)
@@ -116,6 +132,11 @@ class CreateQuestion(webapp2.RequestHandler):
     time.sleep(1)
     self.redirect('/')
 
+
+"""
+show the question content
+@return redirct to the show question page
+"""
 class ShowQuestion(webapp2.RequestHandler):
   def get(self):
     user = users.get_current_user()
@@ -150,6 +171,11 @@ class ShowQuestion(webapp2.RequestHandler):
         'answers':a}
       self.response.out.write(template.render(path, template_values))
 
+
+"""
+show all the questions belongs to a tag
+@return redirct to the show tag page
+"""
 class ShowTags(webapp2.RequestHandler):
   def get(self):
     questionTag=self.request.GET['tags']
@@ -177,6 +203,10 @@ class ShowTags(webapp2.RequestHandler):
       'tag':questionTag}
       self.response.out.write(template.render(path, template_values))
 
+
+"""
+show the page to edit question
+"""
 class EditQuestionPage(webapp2.RequestHandler):
   def get(self):
     self.error(404)
@@ -203,6 +233,11 @@ class EditQuestionPage(webapp2.RequestHandler):
       self.response.write("Question has been deleted")
       self.redirect('/')
 
+
+"""
+update the question in the datastore
+@return redirct to the question page with updated content
+"""
 class UpdateQuestion(webapp2.RequestHandler):
   def get(self):
     self.response.out.write("over")
@@ -220,6 +255,9 @@ class UpdateQuestion(webapp2.RequestHandler):
     time.sleep(1)
     self.redirect('/showQuestion?key='+questionKey)
 
+"""
+show the page to edit answer
+"""
 class EditAnswer(webapp2.RequestHandler):
   def post(self):
     answerKey=self.request.get("key")
@@ -247,6 +285,10 @@ class EditAnswer(webapp2.RequestHandler):
       self.redirect('/showQuestion?key='+a.questionKey)
       
 
+"""
+add the ansewer in the datastore, and email the question holder about the new question
+@return redirct to the question page with updated answer
+"""
 class CreateAnswer(webapp2.RequestHandler):
   def post(self):
     a=AnswerPool(questionKey=self.request.get("questionKey"),
@@ -258,7 +300,7 @@ class CreateAnswer(webapp2.RequestHandler):
     self.redirect('/showQuestion?key='+a.questionKey)
 
     q=db.get(self.request.get("questionKey"))
-    mail.send_mail(sender="Example.com Support <support@example.com>",
+    mail.send_mail(sender="QForum Support <xw805@nyu.edu>",
               to=q.userId,
               subject="New answer has been added",
               body="""
@@ -274,6 +316,10 @@ class CreateAnswer(webapp2.RequestHandler):
               """)
     self.response.write("answer created successfully")
 
+
+"""
+handling vote up to a question
+"""
 class VoteUp(webapp2.RequestHandler):
   def get(self):
       self.response.write("try again")
@@ -312,6 +358,9 @@ class VoteUp(webapp2.RequestHandler):
       self.redirect('/showQuestion?key='+questionKey)
 
 
+"""
+handling vote down of a question
+"""
 class VoteDown(webapp2.RequestHandler):
   def get(self):
       self.response.write("try again")
@@ -350,6 +399,10 @@ class VoteDown(webapp2.RequestHandler):
       time.sleep(1)
       self.redirect('/showQuestion?key='+questionKey)
 
+"""
+handling search by content, using regular expression to find string match
+@return redirct to reasrch result
+"""
 class Search(webapp2.RequestHandler):
   def get(self):
       text=self.request.get("text")
@@ -388,6 +441,11 @@ class Search(webapp2.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
+"""
+update the answer in the datastore
+@return redirct to the question page with updated answer
+"""
+
 class UpdataAnswer(webapp2.RequestHandler):
   def post(self):
       answerKey=self.request.get("key")
@@ -399,6 +457,11 @@ class UpdataAnswer(webapp2.RequestHandler):
       time.sleep(1)
       self.redirect('/showQuestion?key='+a.questionKey)
 
+
+"""
+add a new follow entity in the datastore
+"""
+
 class Follow(webapp2.RequestHandler):
   def get(self):
     self.response.write("please sign in")
@@ -408,6 +471,11 @@ class Follow(webapp2.RequestHandler):
     f.put()
     time.sleep(1)
     self.redirect('/showQuestion?key='+self.request.get("key"))
+
+
+"""
+@return redirct to page showing all question user followed
+"""
 
 class ShowFollow(webapp2.RequestHandler):
   def get(self):
@@ -433,6 +501,11 @@ class ShowFollow(webapp2.RequestHandler):
     else:
       self.response.write("please sign in")
 
+
+"""
+upload image in the blobstore
+@return redirct to showing image repository
+"""
 
 class UploadImage(blobstore_handlers.BlobstoreUploadHandler,webapp2.RequestHandler):
   def get(self):
@@ -461,6 +534,12 @@ class UploadImage(blobstore_handlers.BlobstoreUploadHandler,webapp2.RequestHandl
     except:
       self.redirect('/upload_failure.html')
 
+
+"""
+show a image by boblstore key
+@return redirct to the page showing the image
+"""
+
 class ShowImage(blobstore_handlers.BlobstoreDownloadHandler):
     def get(self, blob_key):
         #blobstore.delete(blob_key)
@@ -468,6 +547,11 @@ class ShowImage(blobstore_handlers.BlobstoreDownloadHandler):
             self.error(404)
         else:
             self.send_blob(blobstore.BlobInfo.get(blob_key))
+
+
+"""
+output the xml format of the question and all follwing answers 
+"""
 
 class RSS(webapp2.RequestHandler):
   def post(self):
@@ -489,6 +573,10 @@ class RSS(webapp2.RequestHandler):
 def main():
     app.run()
 
+
+"""
+url handing
+"""
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     (r'/page.*', MainHandler),
