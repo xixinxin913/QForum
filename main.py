@@ -5,6 +5,8 @@
 import webapp2
 import urllib
 from google.appengine.ext.webapp import template
+from google.appengine.api import datastore_errors
+from google.appengine.ext.db import ReferencePropertyResolveError
 from google.appengine.api import users
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext import blobstore
@@ -111,7 +113,7 @@ class CreateQuestion(webapp2.RequestHandler):
     )
     q.put()
     self.response.write("successfully")
-    time.sleep(2)
+    time.sleep(1)
     self.redirect('/')
 
 class ShowQuestion(webapp2.RequestHandler):
@@ -195,7 +197,11 @@ class EditQuestionPage(webapp2.RequestHandler):
       path = os.path.join(os.path.dirname(__file__), 'templates/editQuestion.html')
       self.response.out.write(template.render(path, template_values))
     else:
-      self.response.out.write("please delete the instance")
+      q = db.get(questionKey)
+      q.delete()
+      time.sleep(1)
+      self.response.write("Question has been deleted")
+      self.redirect('/')
 
 class UpdateQuestion(webapp2.RequestHandler):
   def get(self):
@@ -211,8 +217,35 @@ class UpdateQuestion(webapp2.RequestHandler):
     q.tag=tags
     q.put()
     #redict to show the new question
-    time.sleep(2)
+    time.sleep(1)
     self.redirect('/showQuestion?key='+questionKey)
+
+class EditAnswer(webapp2.RequestHandler):
+  def post(self):
+    answerKey=self.request.get("key")
+    a=db.get(answerKey)
+    q=db.get(a.questionKey)
+    user = users.get_current_user()
+    url = users.create_logout_url('/')
+    url_text = 'Sign Out'
+    questionKey=urllib.unquote(self.request.get("key"))
+    edit=self.request.get("edit")
+    if edit:
+      template_values = {'user': users.get_current_user().email(),
+      'url': url,
+      'url_text': url_text,
+      'name':user.email(),
+      'answer':a,
+      'question':q}
+      path = os.path.join(os.path.dirname(__file__), 'templates/editAnswer.html')
+      self.response.out.write(template.render(path, template_values))
+    else:
+      a = db.get(answerKey)
+      a.delete()
+      time.sleep(1)
+      self.response.write("answers has been deleted")
+      self.redirect('/showQuestion?key='+a.questionKey)
+      
 
 class CreateAnswer(webapp2.RequestHandler):
   def post(self):
@@ -240,28 +273,6 @@ class CreateAnswer(webapp2.RequestHandler):
               The QForum Team
               """)
     self.response.write("answer created successfully")
-
-class EditAnswer(webapp2.RequestHandler):
-	def post(self):
-		answerKey=self.request.get("key")
-		a=db.get(answerKey)
-		q=db.get(a.questionKey)
-		user = users.get_current_user()
-		url = users.create_logout_url('/')
-		url_text = 'Sign Out'
-		questionKey=urllib.unquote(self.request.get("key"))
-		edit=self.request.get("edit")
-		if edit:
-		  template_values = {'user': users.get_current_user().email(),
-		  'url': url,
-		  'url_text': url_text,
-		  'name':user.email(),
-		  'answer':a,
-		  'question':q}
-		  path = os.path.join(os.path.dirname(__file__), 'templates/editAnswer.html')
-		  self.response.out.write(template.render(path, template_values))
-		else:
-		  self.response.out.write("please delete the instance")
 
 class VoteUp(webapp2.RequestHandler):
   def get(self):
@@ -401,7 +412,14 @@ class Follow(webapp2.RequestHandler):
 class ShowFollow(webapp2.RequestHandler):
   def get(self):
     user = users.get_current_user()
+    f1=[]
     f = db.GqlQuery("SELECT * FROM FollowPool where userId= :1" ,user.email())
+    for var in f:
+      try:
+        obj = var.question
+        f1.append(var)
+      except ReferencePropertyResolveError:
+        var.delete
     path = os.path.join(os.path.dirname(__file__), 'templates/showFollow.html')
     if user:
       url = users.create_logout_url('/')
@@ -410,7 +428,7 @@ class ShowFollow(webapp2.RequestHandler):
       'url': url,
       'url_text': url_text,
       'name':user.email(),
-      'questions':f}
+      'questions':f1}
       self.response.out.write(template.render(path, template_values))
     else:
       self.response.write("please sign in")
