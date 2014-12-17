@@ -6,7 +6,7 @@ Prof. Jeffrey Korn
 Final Project-- Question Forum
 ------------------------------------------------------------------------------------------------
 Codes on: https://github.com/xixinxin913/QForum See Demo on http://wxsamy123.appspot.com/
-Feeds in Atom standard available on master branch for each question,feeds feature disabled on tag: experiment
+rss in Atom standard available on master branch for each question,rss feature disabled on tag: experiment
 
 Main functionality:
 ====================
@@ -25,7 +25,7 @@ Main functionality:
    f. can upload image by on the uploadImage page. once the image is uploaded, it wil show up in the image repository page. every login user can view the image repository, and refer to theses images in the question and answers by the copying url 
 
 
-Additional function
+Additional functions
 ======================
 1.Support a moderator mode where a special user can remove questions or answers: each user can remove the question and answer created by themselves
 
@@ -47,3 +47,5 @@ The app is written in Python and deployed with App Engine. It is also developed 
 2. html template: using 10 different html template, including editAnswer.html,editQuestion.html,home.html,question.html,rss.xml,showFollow.html,zhowQuestion.html,showSearch.html,showTags.html,uploadImage.html
 
 3. main.py: all functions communicate back and forth between sever, html, and datbase
+
+

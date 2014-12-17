@@ -1,0 +1,19 @@
+0000000000000000000000000000000000000000 23c9ea3d657eb2a4523a5fcb20a976b0f3a188af xw805 <wxsamy@gmail.com> 1417624082 -0500	commit (initial): initial trial
+23c9ea3d657eb2a4523a5fcb20a976b0f3a188af 90d56ed1befaf9a263ec1a9028397cc58d20fd79 xw805 <wxsamy@gmail.com> 1417794785 -0500	commit: add django template for home and create question page
+90d56ed1befaf9a263ec1a9028397cc58d20fd79 8a1c53e1ff40f5c68fd19df0865e36ca79d5540d xw805 <wxsamy@gmail.com> 1417848629 -0500	commit: implement the datastore model and html page to create question and display questions
+8a1c53e1ff40f5c68fd19df0865e36ca79d5540d 30918e2bd6554cc2a15184498824f2f0bc1b3e1a xw805 <wxsamy@gmail.com> 1417911441 -0500	commit: implement the page to view each question in full content
+30918e2bd6554cc2a15184498824f2f0bc1b3e1a 1aa35c41d9b0f30598bd5d0cd3b34651c906f573 xw805 <wxsamy@gmail.com> 1417930427 -0500	commit: implement showing questions by tags
+1aa35c41d9b0f30598bd5d0cd3b34651c906f573 5ae415e1872b723641a3e956c3bfe69c0e550971 xw805 <wxsamy@gmail.com> 1417976531 -0500	commit: add implementation to edit questions each user has created
+5ae415e1872b723641a3e956c3bfe69c0e550971 2e0279e1fd9ade6f740d9a2fafd1fa4b7facbda6 xw805 <wxsamy@gmail.com> 1417996050 -0500	commit: add modified timestamp
+2e0279e1fd9ade6f740d9a2fafd1fa4b7facbda6 29823dd4239b3341df413972192bb55a45848599 xw805 <wxsamy@gmail.com> 1418005458 -0500	commit: add answer question functionality
+29823dd4239b3341df413972192bb55a45848599 6966527eca339378a82164eb1d1aa165bce28067 xw805 <wxsamy@gmail.com> 1418017203 -0500	commit: add multiple user functionality
+6966527eca339378a82164eb1d1aa165bce28067 d54bbfda3bfe6efd1059c6340b43770327f8872d xw805 <wxsamy@gmail.com> 1418058078 -0500	commit: change layout
+d54bbfda3bfe6efd1059c6340b43770327f8872d 7930ba628c6a2a47299101f6a8824bec02ab6b03 xw805 <wxsamy@gmail.com> 1418079398 -0500	commit: add vote functionality
+7930ba628c6a2a47299101f6a8824bec02ab6b03 3e9f9116947046df0c5f86a3a57d4543b3e81a91 xw805 <wxsamy@gmail.com> 1418187050 -0500	commit: bug fixed
+3e9f9116947046df0c5f86a3a57d4543b3e81a91 df2e7eae3addd499f593bcf25e44329d9730a5bf xw805 <wxsamy@gmail.com> 1418330544 -0500	commit: when multple questions returned, show ten questions per page
+df2e7eae3addd499f593bcf25e44329d9730a5bf 001224ae826d2ee0d2fa1f5bec84c3619e0731ab xw805 <wxsamy@gmail.com> 1418404017 -0500	commit: fix unlogin user
+001224ae826d2ee0d2fa1f5bec84c3619e0731ab d64254b5e9ba3e616120bb78845548c66b6f4775 xw805 <wxsamy@gmail.com> 1418670817 -0500	commit (merge): bug fix
+d64254b5e9ba3e616120bb78845548c66b6f4775 88b299a4376a13c707b7066fdc09d100a83eef3e xw805 <wxsamy@gmail.com> 1418680021 -0500	commit: add RSS function
+88b299a4376a13c707b7066fdc09d100a83eef3e db5c9b296d23e29f91b6bd89d98b5e9ae18fca06 xw805 <wxsamy@gmail.com> 1418684154 -0500	commit: add smart sort functionality
+db5c9b296d23e29f91b6bd89d98b5e9ae18fca06 1217747318d038a1ae5400341bd8ed4cb0071938 xw805 <wxsamy@gmail.com> 1418835706 -0500	commit: implement the delete functionality
+1217747318d038a1ae5400341bd8ed4cb0071938 a7359a5b3c4e90a371806c40a515a955d2c48070 xw805 <wxsamy@gmail.com> 1418843265 -0500	commit: add documentation
